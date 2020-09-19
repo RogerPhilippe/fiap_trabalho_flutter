@@ -13,7 +13,9 @@ class _NewTaskState extends State<NewTask> {
   @override
   Widget build(BuildContext context) {
 
-    final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
+    final _scaffoldKey = new GlobalKey<ScaffoldState>();
+    final _textEditingTaskTitle = TextEditingController();
+    final _textEditingTaskDescription = TextEditingController();
 
     return Scaffold(
       backgroundColor: appDarkGreyColor,
