@@ -1,12 +1,12 @@
 class Task {
 
-  final int id;
-  final String title;
-  final String description;
-  final BigInt dateCreated;
-  final BigInt todoDate;
-  final BigInt lastUpdateDate;
-  final int status;
+  int id;
+  String title;
+  String description;
+  int dateCreated;
+  int todoDate;
+  int lastUpdateDate;
+  int status;
 
   Task(
       this.id,

@@ -18,6 +18,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   List<Task> _tasks = [];
   List<Task>  _lastItemRemoved = [];
   int _lastItemListRemoved = -1;
+  bool _mustUpdateTasks = false;
 
   bool _loading = true;
 
@@ -36,8 +37,26 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print('state = $state');
     if (state == AppLifecycleState.paused) {
-      //_saveDatabaseChanges();
+      if (_lastItemRemoved.length > 0) {
+        _deleteTask(_lastItemRemoved);
+        _lastItemRemoved.clear();
+        _lastItemListRemoved = -1;
+      }
+      if (_mustUpdateTasks && _tasks.length > 0) {
+        _updateTask(_tasks);
+        _mustUpdateTasks = false;
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    if (_lastItemRemoved.length > 0)
+      _deleteTask(_lastItemRemoved);
+    if (_mustUpdateTasks && _tasks.length > 0)
+      _updateTask(_tasks);
   }
 
   @override
@@ -129,11 +148,19 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
 
   // Task List
   Widget _buildTaskList(BuildContext context, int index) {
-    return ListTile(
+    return CheckboxListTile(
       title: Text(_tasks[index].title),
       subtitle: Text(_tasks[index].description),
-      onTap: () {},
-      onLongPress: () {},
+      value: _tasks[index].status == 1,
+      onChanged: (checked) {
+        _mustUpdateTasks = true;
+        setState(() {
+          if (checked)
+            _tasks[index].status = 1;
+          else
+            _tasks[index].status = 0;
+        });
+      },
     );
   }
 
@@ -172,7 +199,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
           bool mustUpdateTasks = await Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => NewTask())
           );
-          if (mustUpdateTasks) {
+          if (mustUpdateTasks != null && mustUpdateTasks) {
             _loading = true;
             _loadTaskList();
           }
@@ -192,6 +219,23 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
         _loading = false;
       }).catchError((onError) => print('Erro ao buscar tarefas!'));
     }).catchError((onError) => print('Erro ao abrir banco de dados!'));
+  }
+
+  void _deleteTask(List<Task> tasks) {
+
+    DatabaseHandler.getDatabase().then((db) {
+      tasks.forEach((task) {
+        TaskRepository.delete(task, db).then((value) => print("Task Removed!"));
+      });
+    });
+  }
+
+  void _updateTask(List<Task> tasks) {
+    DatabaseHandler.getDatabase().then((db) {
+      tasks.forEach((task) {
+        TaskRepository.update(task, db).then((value) => print("Task Updated!"));
+      });
+    });
   }
 
 }
