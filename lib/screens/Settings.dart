@@ -65,7 +65,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                 height: 90.0,
                 width: double.infinity,
                 child: _buildDefaultBtn("CADASTRAR EMAIL", () {
-                  if (UserSession.name.isEmpty)
+                  if (UserSession.name == null || UserSession.name.isEmpty)
                     _saveUserDialog(context);
                   else {
                     _buildDialog(
@@ -88,7 +88,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                 height: 90.0,
                 width: double.infinity,
                 child: _buildDefaultBtn("SALVAR NA NUVEM", () {
-                  if (UserSession.name.isEmpty) {
+                  if (UserSession.name == null || UserSession.name.isEmpty) {
                     _showMsgMustCreateUser();
                   }
                 }),
@@ -98,7 +98,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                 height: 90.0,
                 width: double.infinity,
                 child: _buildDefaultBtn("BAIXAR DA NUVEM", () {
-                  if (UserSession.name.isEmpty) {
+                  if (UserSession.name == null || UserSession.name.isEmpty) {
                     _showMsgMustCreateUser();
                   }
                 }),
@@ -232,7 +232,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildDefaultText("Você precisa de um usuário cadastrado para sincronizar ocm a nuvem.", 16)
+            _buildDefaultText("Você precisa de um usuário cadastrado para sincronizar com a nuvem.", 16)
           ],
         )
     );
