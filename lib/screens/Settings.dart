@@ -3,6 +3,7 @@ import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/model/User.dart';
 import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/FirebaseService.dart';
+import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -94,7 +95,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                                 ],
                               )
                           );
-                          print('User exists!');
+                          LogUtils.info('User exists!');
                         }
                       }),
                     ),
@@ -248,23 +249,23 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
 
         var doc = documentSnapshot.docs[0];
         var data = doc.data();
-        print('Usuário já cadastrado na nuvem: ${data["userEmail"]}');
+        LogUtils.info('Usuário já cadastrado na nuvem: ${data["userEmail"]}');
         _saveUser(user);
 
       } else {
 
-          print('Usuário não existe na nuvem.');
+        LogUtils.info('Usuário não existe na nuvem.');
 
           FirebaseService.saveFireStore(user, firestore)
               .then((value) {
-                print('User saved in Firebase');
+            LogUtils.info('User saved in Firebase');
                 _saveUser(user);
               })
               .catchError((onError) {
-                print('Erro ao tentar salvar no firebase!');
+            LogUtils.error('Erro ao tentar salvar no firebase!');
               });
       }
-    }).catchError((onError) => print('Erro ao buscar usuário na nuvem.'));
+    }).catchError((onError) => LogUtils.error('Erro ao buscar usuário na nuvem.'));
 
   }
 
@@ -272,17 +273,17 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
 
     DatabaseHandler.getDatabase().then((db) => {
       UserRepository.insert(user, db).then((value) {
-        print('User saved local db!');
+        LogUtils.info('User saved local db!');
         UserSession.userID = user.id;
         UserSession.name = user.name;
         UserSession.email = user.email;
       })
           .catchError((onError, error) {
-        print('Error try save user!');
-        print(onError);
-        print(error);
+        LogUtils.error('Error try save user!');
+        LogUtils.error(onError);
+        LogUtils.error(error);
       })
-    }).catchError((onError) => print('Erro ao tentar abrir banco!'));
+    }).catchError((onError) => LogUtils.error('Erro ao tentar abrir banco!'));
   }
 
   void _showMsgMustCreateUser() {

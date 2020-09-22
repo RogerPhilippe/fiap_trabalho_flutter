@@ -1,6 +1,7 @@
 import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
+import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/NewTask.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,7 +36,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
+    LogUtils.info('state = $state');
     if (state == AppLifecycleState.paused) {
       if (_lastItemRemoved.length > 0) {
         _deleteTask(_lastItemRemoved);
@@ -217,15 +218,15 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
         if (taskList != null)
           setState(() => _tasks = taskList);
         _loading = false;
-      }).catchError((onError) => print('Erro ao buscar tarefas!'));
-    }).catchError((onError) => print('Erro ao abrir banco de dados!'));
+      }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
+    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
   }
 
   void _deleteTask(List<Task> tasks) {
 
     DatabaseHandler.getDatabase().then((db) {
       tasks.forEach((task) {
-        TaskRepository.delete(task, db).then((value) => print("Task Removed!"));
+        TaskRepository.delete(task, db).then((value) => LogUtils.info("Task Removed!"));
       });
     });
   }
@@ -233,7 +234,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   void _updateTask(List<Task> tasks) {
     DatabaseHandler.getDatabase().then((db) {
       tasks.forEach((task) {
-        TaskRepository.update(task, db).then((value) => print("Task Updated!"));
+        TaskRepository.update(task, db).then((value) => LogUtils.info("Task Updated!"));
       });
     });
   }

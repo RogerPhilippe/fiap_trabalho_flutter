@@ -1,5 +1,6 @@
 import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
+import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/About.dart';
@@ -35,7 +36,7 @@ class _HomeState extends State<Home> {
         _loginFirebase(auth);
       else {
         UserSession.userToken = firebaseUser.uid;
-        print('Logado no firebase!');
+        LogUtils.info("Logado no firebase!");
       }
     }).catchError((onError) => _loginFirebase(auth));
 
@@ -47,11 +48,11 @@ class _HomeState extends State<Home> {
        
        _showContent();
      }).catchError((onError) {
-       print('Error find user.');
+       LogUtils.error('Error find user.');
        _showContent();
      });
     }).catchError((onError) {
-      print('Error try open db.');
+      LogUtils.error('Error try open db.');
       _showContent();
     });
   }
@@ -158,11 +159,11 @@ class _HomeState extends State<Home> {
 
   void _loginFirebase(FirebaseAuth auth) {
 
-    print('Fazendo login no firebase.');
+    LogUtils.info('Fazendo login no firebase.');
 
     auth.signInWithEmailAndPassword(email: "system_user@email.com", password: "syste@2020")
         .then((firebaseUser) => UserSession.userToken = firebaseUser.uid)
-        .catchError((onError) => print('Erro ao fazer login firebase.'));
+        .catchError((onError) => LogUtils.error('Erro ao fazer login firebase.'));
   }
 
 }

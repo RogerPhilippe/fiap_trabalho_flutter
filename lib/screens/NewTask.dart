@@ -1,6 +1,7 @@
 import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
+import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -172,16 +173,16 @@ class _NewTaskState extends State<NewTask> {
 
     DatabaseHandler.getDatabase().then((db) {
       TaskRepository.insert(task, db).then((value) {
-        print("Task salva!");
+        LogUtils.info("Task salva!");
         Navigator.of(context).pop(true);
       }).catchError((onError) {
-        print('Erro ao tentar salvar');
-        print(onError);
+        LogUtils.error('Erro ao tentar salvar');
+        LogUtils.error(onError);
         setState(() {
           _loading = false;
         });
       });
-    }).catchError((onError) => print('Erro ao abrir banco de dados!'));
+    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
 
   }
 
