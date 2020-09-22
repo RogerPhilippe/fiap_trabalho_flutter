@@ -10,7 +10,7 @@ class DatabaseHandler {
 
     String createTableTasks = "CREATE TABLE IF NOT EXISTS ${TablesTO.taskTable} "
         "("
-        "${TaskTO.id} INTEGER PRIMARY KEY, "
+        "${TaskTO.id} TEXT PRIMARY KEY, "
         "${TaskTO.title} TEXT NOT NULL, "
         "${TaskTO.description} TEXT NOT NULL, "
         "${TaskTO.dateCreated} INTEGER NOT NULL, "
@@ -21,7 +21,7 @@ class DatabaseHandler {
 
     String createTableUsers = "CREATE TABLE IF NOT EXISTS ${TablesTO.userTable} "
         "("
-        "${UserTO.id} INTEGER PRIMARY KEY, "
+        "${UserTO.id} TEXT PRIMARY KEY, "
         "${UserTO.name} TEXT NOT NULL, "
         "${UserTO.email} TEXT NOT NULL"
         ")";

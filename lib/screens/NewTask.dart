@@ -147,7 +147,7 @@ class _NewTaskState extends State<NewTask> {
     return RaisedButton(
         onPressed: () {
           if(_formKey.currentState.validate()) {
-            var id = DateTime.now().millisecondsSinceEpoch;
+            var id = DateTime.now().millisecondsSinceEpoch.toString();
             var title = taskTitleController.text;
             var description = taskDescriptionController.text;
             var todoDate = taskTodoDateController.text;

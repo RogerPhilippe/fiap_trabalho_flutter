@@ -1,6 +1,6 @@
 class Task {
 
-  int id;
+  String id;
   String title;
   String description;
   int dateCreated;

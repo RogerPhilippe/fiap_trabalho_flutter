@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/model/User.dart';
 import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
+import 'package:fiap_trabalho_flutter/data/service/FirebaseService.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -23,11 +26,19 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   final _textFieldEmailController = TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Firebase.initializeApp();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
         key: _scaffoldKey,
         backgroundColor: appDarkGreyColor,
+        resizeToAvoidBottomPadding: false,
         body: _buildBody()
     );
   }
@@ -60,57 +71,72 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       ]
                   )
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
-                height: 90.0,
-                width: double.infinity,
-                child: _buildDefaultBtn("CADASTRAR EMAIL", () {
-                  if (UserSession.name == null || UserSession.name.isEmpty)
-                    _saveUserDialog(context);
-                  else {
-                    _buildDialog(
-                        context,
-                      "Usuário já cadastrado",
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildDefaultText(UserSession.name, 16),
-                            _buildDefaultText(UserSession.email, 16)
-                          ],
-                        )
-                    );
-                    print('User exists!');
-                  }
-                }),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
-                height: 90.0,
-                width: double.infinity,
-                child: _buildDefaultBtn("SALVAR NA NUVEM", () {
-                  if (UserSession.name == null || UserSession.name.isEmpty) {
-                    _showMsgMustCreateUser();
-                  }
-                }),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
-                height: 90.0,
-                width: double.infinity,
-                child: _buildDefaultBtn("BAIXAR DA NUVEM", () {
-                  if (UserSession.name == null || UserSession.name.isEmpty) {
-                    _showMsgMustCreateUser();
-                  }
-                }),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
-                height: 90.0,
-                width: double.infinity,
-                child: _buildDefaultBtn("APAGAR TAREFAS", () => {
+              SingleChildScrollView(
+                padding: EdgeInsets.only(top: 48),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      height: 90.0,
+                      width: double.infinity,
+                      child: _buildDefaultBtn("CADASTRAR EMAIL", () {
+                        if (UserSession.name == null || UserSession.name.isEmpty)
+                          _saveUserDialog(context);
+                        else {
+                          _buildDialog(
+                              context,
+                              "Usuário já cadastrado",
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildDefaultText(UserSession.name, 16),
+                                  _buildDefaultText(UserSession.email, 16)
+                                ],
+                              )
+                          );
+                          print('User exists!');
+                        }
+                      }),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      height: 90.0,
+                      width: double.infinity,
+                      child: _buildDefaultBtn("SALVAR NA NUVEM", () {
+                        if (UserSession.name == null || UserSession.name.isEmpty) {
+                          _showMsgMustCreateUser();
+                        }
+                      }),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      height: 90.0,
+                      width: double.infinity,
+                      child: _buildDefaultBtn("BAIXAR DA NUVEM", () {
+                        if (UserSession.name == null || UserSession.name.isEmpty) {
+                          _showMsgMustCreateUser();
+                        }
+                      }),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      height: 90.0,
+                      width: double.infinity,
+                      child: _buildDefaultBtn("APAGAR TAREFAS", () => {
 
-                }),
-              ),
+                      }),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      height: 90.0,
+                      width: double.infinity,
+                      child: _buildDefaultBtn("APAGAR USUÁRIO", () => {
+
+                      }),
+                    ),
+                  ],
+                ),
+              )
             ]
         )
     );
@@ -193,8 +219,12 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                     if (_formKey.currentState.validate()) {
                       var name = _textFieldNameController.text;
                       var email = _textFieldEmailController.text;
-                      var user = User(DateTime.now().millisecondsSinceEpoch, name.toUpperCase(), email.toLowerCase());
-                      _saveUser(user);
+                      var user = User(
+                          DateTime.now().millisecondsSinceEpoch.toString(),
+                          name.toUpperCase(),
+                          email.toLowerCase()
+                      );
+                      _saveFirebaseUser(user);
                       Navigator.of(context).pop();
                     }
                   },
@@ -209,15 +239,45 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         });
   }
 
+  void _saveFirebaseUser(User user) {
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    FirebaseService.findUserFirestore(user, firestore).then((documentSnapshot) {
+      if (documentSnapshot != null && documentSnapshot.docs.isNotEmpty) {
+
+        var doc = documentSnapshot.docs[0];
+        var data = doc.data();
+        print('Usuário já cadastrado na nuvem: ${data["userEmail"]}');
+        _saveUser(user);
+
+      } else {
+
+          print('Usuário não existe na nuvem.');
+
+          FirebaseService.saveFireStore(user, firestore)
+              .then((value) {
+                print('User saved in Firebase');
+                _saveUser(user);
+              })
+              .catchError((onError) {
+                print('Erro ao tentar salvar no firebase!');
+              });
+      }
+    }).catchError((onError) => print('Erro ao buscar usuário na nuvem.'));
+
+  }
+
   void _saveUser(User user) {
 
     DatabaseHandler.getDatabase().then((db) => {
       UserRepository.insert(user, db).then((value) {
-        print('User saved!');
+        print('User saved local db!');
+        UserSession.userID = user.id;
         UserSession.name = user.name;
         UserSession.email = user.email;
       })
-      .catchError((onError, error) {
+          .catchError((onError, error) {
         print('Error try save user!');
         print(onError);
         print(error);
@@ -237,5 +297,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         )
     );
   }
+
 
 }

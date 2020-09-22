@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "232471716758",
+    "firebase_url": "https://fiap-trabalho-flutter.firebaseio.com",
+    "project_id": "fiap-trabalho-flutter",
+    "storage_bucket": "fiap-trabalho-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232471716758:android:718d2a9620e38993a633b7",
+        "android_client_info": {
+          "package_name": "com.example.fiap_trabalho_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232471716758-6rbc9cqdqls49q8j70evse4pjio86d9g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fiap_trabalho_flutter",
+            "certificate_hash": "4782ea452f07c323adc16e6fbdc0886aa473af79"
+          }
+        },
+        {
+          "client_id": "232471716758-l2gnsuouhi7vsnb8juiucpflin6d401j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9If0PsXLQpBupLx-YS1zcDVA7KW5DSPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232471716758-l2gnsuouhi7vsnb8juiucpflin6d401j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

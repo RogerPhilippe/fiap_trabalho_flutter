@@ -5,6 +5,7 @@ import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/About.dart';
 import 'package:fiap_trabalho_flutter/screens/ListTasks.dart';
 import 'package:fiap_trabalho_flutter/screens/Settings.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'NewTask.dart';
@@ -25,10 +26,25 @@ class _HomeState extends State<Home> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    final auth = FirebaseAuth.instance;
+
+    auth.currentUser()
+        .then((firebaseUser) {
+      if (firebaseUser == null || firebaseUser.uid == null || firebaseUser.uid.isEmpty)
+        _loginFirebase(auth);
+      else {
+        UserSession.userToken = firebaseUser.uid;
+        print('Logado no firebase!');
+      }
+    }).catchError((onError) => _loginFirebase(auth));
+
     DatabaseHandler.getDatabase().then((db) {
      UserRepository.findAll(db).then((users) {
+       UserSession.userID = users[0].id;
        UserSession.name = users[0].name;
        UserSession.email = users[0].email;
+       
        _showContent();
      }).catchError((onError) {
        print('Error find user.');
@@ -138,6 +154,15 @@ class _HomeState extends State<Home> {
   void _showContent() {
     _loading = false;
     setState(() => print(''));
+  }
+
+  void _loginFirebase(FirebaseAuth auth) {
+
+    print('Fazendo login no firebase.');
+
+    auth.signInWithEmailAndPassword(email: "system_user@email.com", password: "syste@2020")
+        .then((firebaseUser) => UserSession.userToken = firebaseUser.uid)
+        .catchError((onError) => print('Erro ao fazer login firebase.'));
   }
 
 }
