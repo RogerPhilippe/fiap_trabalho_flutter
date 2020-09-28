@@ -1,4 +1,5 @@
 import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
+import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
@@ -6,6 +7,7 @@ import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/NewTask.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ListTasks extends StatefulWidget {
   @override
@@ -29,8 +31,6 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
-
-    _loadTaskList();
 
   }
 
@@ -62,6 +62,8 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+
+    var controller = Provider.of<Controller>(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -105,9 +107,6 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
                   )
                 ]
               )
-            ),
-            Expanded(
-              child: _buildList()
             )
           ]
       )
@@ -121,7 +120,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildList() {
+  Widget _buildList(List<Task> _tasks) {
     return ListView.builder(
         padding: EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
         itemCount: _tasks.length,
@@ -202,7 +201,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
           );
           if (mustUpdateTasks != null && mustUpdateTasks) {
             _loading = true;
-            _loadTaskList();
+            //_loadTaskList();
           }
         },
         tooltip: 'Criar Tarefa',
@@ -211,16 +210,16 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     } else return SizedBox(height: 20);
   }
 
-  void _loadTaskList() {
-
-    DatabaseHandler.getDatabase().then((db) {
-      TaskRepository.tasks(db).then((taskList) {
-        if (taskList != null)
-          setState(() => _tasks = taskList);
-        _loading = false;
-      }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
-    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
-  }
+  // void _loadTaskList() {
+  //
+  //   DatabaseHandler.getDatabase().then((db) {
+  //     TaskRepository.tasks(db).then((taskList) {
+  //       if (taskList != null)
+  //         setState(() => _tasks = taskList);
+  //       _loading = false;
+  //     }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
+  //   }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
+  // }
 
   void _deleteTask(List<Task> tasks) {
 

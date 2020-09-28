@@ -9,6 +9,7 @@ import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class Settings extends StatefulWidget {
 
@@ -25,6 +26,8 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _textFieldNameController = TextEditingController();
   final _textFieldEmailController = TextEditingController();
+
+  final userSession = GetIt.instance.get<UserSession>();
 
   @override
   void initState() {
@@ -81,7 +84,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       height: 90.0,
                       width: double.infinity,
                       child: _buildDefaultBtn("CADASTRAR EMAIL", () {
-                        if (UserSession.name == null || UserSession.name.isEmpty)
+                        if (userSession.name == null || userSession.name.isEmpty)
                           _saveUserDialog(context);
                         else {
                           _buildDialog(
@@ -90,8 +93,8 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                               Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  _buildDefaultText(UserSession.name, 16),
-                                  _buildDefaultText(UserSession.email, 16)
+                                  _buildDefaultText(userSession.name, 16),
+                                  _buildDefaultText(userSession.email, 16)
                                 ],
                               )
                           );
@@ -104,7 +107,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       height: 90.0,
                       width: double.infinity,
                       child: _buildDefaultBtn("SALVAR NA NUVEM", () {
-                        if (UserSession.name == null || UserSession.name.isEmpty) {
+                        if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
                         }
                       }),
@@ -114,7 +117,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       height: 90.0,
                       width: double.infinity,
                       child: _buildDefaultBtn("BAIXAR DA NUVEM", () {
-                        if (UserSession.name == null || UserSession.name.isEmpty) {
+                        if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
                         }
                       }),
@@ -274,9 +277,9 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
     DatabaseHandler.getDatabase().then((db) => {
       UserRepository.insert(user, db).then((value) {
         LogUtils.info('User saved local db!');
-        UserSession.userID = user.id;
-        UserSession.name = user.name;
-        UserSession.email = user.email;
+        userSession.userID = user.id;
+        userSession.name = user.name;
+        userSession.email = user.email;
       })
           .catchError((onError, error) {
         LogUtils.error('Error try save user!');

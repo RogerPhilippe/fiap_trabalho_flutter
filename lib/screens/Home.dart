@@ -8,6 +8,7 @@ import 'package:fiap_trabalho_flutter/screens/ListTasks.dart';
 import 'package:fiap_trabalho_flutter/screens/Settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import 'NewTask.dart';
 
@@ -23,6 +24,8 @@ class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
   bool _loading = true;
 
+  final userSession = GetIt.instance.get<UserSession>();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -35,16 +38,16 @@ class _HomeState extends State<Home> {
       if (firebaseUser == null || firebaseUser.uid == null || firebaseUser.uid.isEmpty)
         _loginFirebase(auth);
       else {
-        UserSession.userToken = firebaseUser.uid;
+        userSession.userToken = firebaseUser.uid;
         LogUtils.info("Logado no firebase!");
       }
     }).catchError((onError) => _loginFirebase(auth));
 
     DatabaseHandler.getDatabase().then((db) {
      UserRepository.findAll(db).then((users) {
-       UserSession.userID = users[0].id;
-       UserSession.name = users[0].name;
-       UserSession.email = users[0].email;
+       userSession.userID = users[0].id;
+       userSession.name = users[0].name;
+       userSession.email = users[0].email;
        
        _showContent();
      }).catchError((onError) {
@@ -162,7 +165,7 @@ class _HomeState extends State<Home> {
     LogUtils.info('Fazendo login no firebase.');
 
     auth.signInWithEmailAndPassword(email: "system_user@email.com", password: "syste@2020")
-        .then((firebaseUser) => UserSession.userToken = firebaseUser.uid)
+        .then((firebaseUser) => userSession.userToken = firebaseUser.uid)
         .catchError((onError) => LogUtils.error('Erro ao fazer login firebase.'));
   }
 

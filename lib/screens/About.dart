@@ -1,6 +1,8 @@
+import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class About extends StatefulWidget {
 
@@ -16,6 +18,8 @@ class _AboutState extends State<About> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _textFieldNameController = TextEditingController();
   final _textFieldEmailController = TextEditingController();
+
+  var controller = Controller();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +59,16 @@ class _AboutState extends State<About> with WidgetsBindingObserver {
                       ]
                   )
               ),
+              Observer(builder: (_){
+                return Text("${controller.clicks}");
+              }),
+              RaisedButton(
+                  onPressed: () {
+                    controller.increment();
+                    },
+                  child: Text("Click"),
+                  color: Colors.orange
+              )
             ]
         )
     );

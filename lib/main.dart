@@ -1,10 +1,18 @@
+import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
+import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 import 'helpers/Constants.dart';
 import 'screens/Home.dart';
 
 void main() {
+
+  GetIt getIt = GetIt.instance;
+  getIt.registerSingleton<UserSession>(UserSession());
+
   debugPaintSizeEnabled = false;
   runApp(_Main());
 }
@@ -13,10 +21,15 @@ class _Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: appTitle,
-      theme: ThemeData.dark(),
-      home: Home(),
+    return MultiProvider(
+      providers: [
+        Provider<Controller>(create: (_) => Controller())
+      ],
+      child: MaterialApp(
+        title: appTitle,
+        theme: ThemeData.dark(),
+        home: Home(),
+      )
     );
   }
 

@@ -1,10 +1,8 @@
-import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
-import 'package:fiap_trabalho_flutter/data/model/Task.dart';
-import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
-import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
+import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 class NewTask extends StatefulWidget {
   @override
@@ -25,24 +23,26 @@ class _NewTaskState extends State<NewTask> {
   @override
   Widget build(BuildContext context) {
 
+    var controller = Provider.of<Controller>(context);
+
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
       backgroundColor: appDarkGreyColor,
-      body: _buildBody(),
+      body: _buildBody(controller),
     );
   }
 
   // Body
-  Widget _buildBody() {
+  Widget _buildBody(Controller controller) {
     return Stack(
       children: <Widget>[
-        _buildContent(),
+        _buildContent(controller),
       ],
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(Controller controller) {
     return SafeArea(
       child: Column(
         children: [
@@ -63,14 +63,14 @@ class _NewTaskState extends State<NewTask> {
           ),
           SingleChildScrollView(
             padding: EdgeInsets.only(top: 12.0, bottom: 12.0),
-            child: _formContent(),
+            child: _formContent(controller),
           )
         ],
       ),
     );
   }
 
-  Widget _formContent() {
+  Widget _formContent(Controller controller) {
     return Container(
       child: Form(
         key: _formKey,
@@ -78,30 +78,60 @@ class _NewTaskState extends State<NewTask> {
           children: [
             Container(
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-              child: _buildTextFormField(
-                  "Tarefa",
-                  taskTitleController, false, true, "Digite o título da tarefa",
-                  TextInputType.text)
+              child: TextFormField(
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                    hintText: "Tarefa",
+                    hintStyle: TextStyle(color: Colors.orange),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange)
+                    )
+                ),
+                controller: taskTitleController,
+                onChanged: controller.setName,
+                // ignore: missing_return
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "Preencha o campo.";
+                  }
+                },
+              ),
             ),
             Container(
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-              child: _buildTextFormField(
-                  "Detalhes",
-                  taskDescriptionController, false, false, "Digite a descrição da tarefa",
-                  TextInputType.text)
+              child: TextField(
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                    hintText: "Detalhes",
+                    hintStyle: TextStyle(color: Colors.orange),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange)
+                    )
+                ),
+                controller: taskDescriptionController,
+                onChanged: controller.setDescription,
+              ),
             ),
             Container(
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-              child: _buildTextFormField(
-                  "Data",
-                  taskTodoDateController, false, false, "Digite a data da tarefa",
-                  TextInputType.text)
+              child: TextField(
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                    hintText: "Data",
+                    hintStyle: TextStyle(color: Colors.orange),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange)
+                    )
+                ),
+                controller: taskTodoDateController,
+                onChanged: controller.setDateTodo,
+              ),
             ),
             Container(
               padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
               height: 90.0,
               width: double.infinity,
-              child: _buildSaveBtn()
+              child: _buildSaveBtn(controller)
             ),
           ],
         ),
@@ -116,49 +146,11 @@ class _NewTaskState extends State<NewTask> {
     );
   }
 
-  Widget _buildTextFormField(
-      String hint,
-      TextEditingController controller,
-      bool obscureText,
-      bool mandatory,
-      String errorMsg,
-      TextInputType textInputType
-      ) {
-    return TextFormField(
-      keyboardType: textInputType,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.orange),
-          focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.orange)
-          )
-      ),
-      controller: controller,
-      // ignore: missing_return
-      validator: (value) {
-        if (mandatory && value.isEmpty) {
-          return errorMsg;
-        }
-      },
-    );
-  }
-
-  Widget _buildSaveBtn() {
+  Widget _buildSaveBtn(Controller controller) {
     return RaisedButton(
         onPressed: () {
           if(_formKey.currentState.validate()) {
-            var id = DateTime.now().millisecondsSinceEpoch.toString();
-            var title = taskTitleController.text;
-            var description = taskDescriptionController.text;
-            var todoDate = taskTodoDateController.text;
-            var dateCreated = DateTime.now().millisecondsSinceEpoch;
-            var dateLastUpdate = DateTime.now().millisecondsSinceEpoch;
-            final task = new Task(id, title, description, dateCreated, 0, dateLastUpdate, 0);
-            setState(() {
-              _loading = true;
-            });
-            saveTask(task);
+            controller.saveTask();
           }
         },
         child: Text(
@@ -167,23 +159,6 @@ class _NewTaskState extends State<NewTask> {
         ),
         color: Colors.orange
     );
-  }
-
-  void saveTask(Task task) {
-
-    DatabaseHandler.getDatabase().then((db) {
-      TaskRepository.insert(task, db).then((value) {
-        LogUtils.info("Task salva!");
-        Navigator.of(context).pop(true);
-      }).catchError((onError) {
-        LogUtils.error('Erro ao tentar salvar');
-        LogUtils.error(onError);
-        setState(() {
-          _loading = false;
-        });
-      });
-    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
-
   }
 
 }
