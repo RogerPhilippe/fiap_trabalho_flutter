@@ -84,6 +84,21 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$itemsAtom = Atom(name: 'ControllerBase.items');
+
+  @override
+  ObservableList<Task> get items {
+    _$itemsAtom.reportRead();
+    return super.items;
+  }
+
+  @override
+  set items(ObservableList<Task> value) {
+    _$itemsAtom.reportWrite(value, super.items, () {
+      super.items = value;
+    });
+  }
+
   final _$ControllerBaseActionController =
       ActionController(name: 'ControllerBase');
 
@@ -132,13 +147,36 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
+  void saveTask() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.saveTask');
+    try {
+      return super.saveTask();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void loadTaskList() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.loadTaskList');
+    try {
+      return super.loadTaskList();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 clicks: ${clicks},
 name: ${name},
 description: ${description},
 dateTodo: ${dateTodo},
-taskSaved: ${taskSaved}
+taskSaved: ${taskSaved},
+items: ${items}
     ''';
   }
 }

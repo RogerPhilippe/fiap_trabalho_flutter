@@ -1,3 +1,4 @@
+import 'package:fiap_trabalho_flutter/data/controllers/ItemModel.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
@@ -23,6 +24,8 @@ abstract class ControllerBase with Store {
   String dateTodo = "";
   @observable
   bool taskSaved = false;
+  @observable
+  ObservableList<Task> items = ObservableList<Task>();
 
   @action
   void increment() {
@@ -61,6 +64,19 @@ abstract class ControllerBase with Store {
       });
     }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
 
+  }
+
+  @action
+  void loadTaskList() {
+
+    DatabaseHandler.getDatabase().then((db) {
+      TaskRepository.tasks(db).then((taskList) {
+        if (taskList != null) {
+          items.clear();
+          items.addAll(taskList);
+        }
+      }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
+    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
   }
 
 }

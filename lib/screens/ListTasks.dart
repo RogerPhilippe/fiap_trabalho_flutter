@@ -1,5 +1,6 @@
 import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
+import 'package:fiap_trabalho_flutter/data/controllers/ItemModel.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
@@ -7,6 +8,7 @@ import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/NewTask.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 class ListTasks extends StatefulWidget {
@@ -23,7 +25,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   int _lastItemListRemoved = -1;
   bool _mustUpdateTasks = false;
 
-  bool _loading = true;
+  bool _loading = false;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -64,17 +66,18 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
 
     var controller = Provider.of<Controller>(context);
+    controller.loadTaskList();
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: appDarkGreyColor,
-      body: _buildBody(),
+      body: _buildBody(controller),
       floatingActionButton: _buildFloatingButton(context)
     );
   }
 
   // Body
-  Widget _buildBody() {
+  Widget _buildBody(Controller controller) {
     if (_loading) {
       return new Center(
         child: new CircularProgressIndicator(),
@@ -83,13 +86,13 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     else {
       return Stack(
         children: <Widget>[
-          _buildContent(),
+          _buildContent(controller),
         ],
       );
     }
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(Controller controller) {
     return SafeArea(
         child: Column(
           children: <Widget> [
@@ -107,6 +110,9 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
                   )
                 ]
               )
+            ),
+            Expanded(
+              child: _buildList(controller.items)
             )
           ]
       )
@@ -120,17 +126,19 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildList(List<Task> _tasks) {
-    return ListView.builder(
-        padding: EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
-        itemCount: _tasks.length,
-        itemBuilder: (context, index) =>
-            _buildDismissibleTaskList(context, index)
-    );
+  Widget _buildList(List<Task> list) {
+    return Observer(builder: (_) {
+      return ListView.builder(
+          padding: EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
+          itemCount: list.length,
+          itemBuilder: (context, index) =>
+              _buildDismissibleTaskList(context, index, list)
+      );
+    });
   }
 
   // Dismissible Task list
-  Widget _buildDismissibleTaskList(BuildContext context, int index) {
+  Widget _buildDismissibleTaskList(BuildContext context, int index, List<Task> list) {
     return Dismissible(
       key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
       background: Container(
@@ -141,34 +149,33 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
           )
       ),
       direction: DismissDirection.startToEnd,
-      child: _buildTaskList(context, index),
-      onDismissed: (direction) => _removeTask(direction, index) ,
+      child: _buildTaskList(context, index, list),
+      onDismissed: (direction) => _removeTask(direction, index, list),
     );
   }
 
   // Task List
-  Widget _buildTaskList(BuildContext context, int index) {
+  Widget _buildTaskList(BuildContext context, int index, List<Task> list) {
     return CheckboxListTile(
-      title: Text(_tasks[index].title),
-      subtitle: Text(_tasks[index].description),
-      value: _tasks[index].status == 1,
-      onChanged: (checked) {
-        _mustUpdateTasks = true;
-        setState(() {
-          if (checked)
-            _tasks[index].status = 1;
-          else
-            _tasks[index].status = 0;
-        });
-      },
+        title: Text(list[index].title),
+        subtitle: Text(list[index].description),
+        value: list[index].status == 1,
+        onChanged: (checked) {
+          setState(() {
+            if (checked)
+              list[index].status = 1;
+            else
+              list[index].status = 0;
+          });
+        }
     );
   }
 
-  void _removeTask(DismissDirection direction, int index) {
+  void _removeTask(DismissDirection direction, int index, List<Task> list) {
     setState(() {
-      _lastItemRemoved.add(_tasks[index]);
+      _lastItemRemoved.add(list[index]);
       _lastItemListRemoved = index;
-      _tasks.removeAt(index);
+      list.removeAt(index);
       final snack = _snackBar();
       _scaffoldKey.currentState.showSnackBar(snack);
     });
@@ -209,17 +216,6 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
       );
     } else return SizedBox(height: 20);
   }
-
-  // void _loadTaskList() {
-  //
-  //   DatabaseHandler.getDatabase().then((db) {
-  //     TaskRepository.tasks(db).then((taskList) {
-  //       if (taskList != null)
-  //         setState(() => _tasks = taskList);
-  //       _loading = false;
-  //     }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
-  //   }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
-  // }
 
   void _deleteTask(List<Task> tasks) {
 
