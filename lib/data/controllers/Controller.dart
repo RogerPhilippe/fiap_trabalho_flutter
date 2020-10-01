@@ -1,4 +1,3 @@
-import 'package:fiap_trabalho_flutter/data/controllers/ItemModel.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
@@ -25,7 +24,11 @@ abstract class ControllerBase with Store {
   @observable
   bool taskSaved = false;
   @observable
+  bool tasksLoaded = false;
+  @observable
   ObservableList<Task> items = ObservableList<Task>();
+  List<Task> updateListTask = [];
+  List<Task> removedTaskList = [];
 
   @action
   void increment() {
@@ -75,8 +78,72 @@ abstract class ControllerBase with Store {
           items.clear();
           items.addAll(taskList);
         }
+        tasksLoaded = true;
       }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
     }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
+  }
+
+  @action
+  void setItemCheckStatus(bool status, int index) {
+
+    var task = items[index];
+    task.status = status ? 1 : 0;
+    updateListTask.add(task);
+    items.removeAt(index);
+    items.insert(index, task);
+  }
+
+  @action
+  void dispose() {
+
+    if (removedTaskList.isNotEmpty)
+      _deleteTask(removedTaskList);
+    if (updateListTask.isNotEmpty)
+      _updateTask(updateListTask);
+    _cleanVariables();
+  }
+
+  void _cleanVariables() {
+
+    clicks = 0;
+    name = "";
+    description = "";
+    dateTodo = "";
+    taskSaved = false;
+    tasksLoaded = false;
+    items = ObservableList<Task>();
+    updateListTask = [];
+    removedTaskList = [];
+  }
+
+  @action
+  void removeList(int index) {
+    removedTaskList.add(items[index]);
+    items.removeAt(index);
+  }
+
+  @action
+  void cancelLastItemRemoved(int index) {
+    var task = removedTaskList.last;
+    removedTaskList.removeLast();
+    items.insert(index, task);
+  }
+
+  void _deleteTask(List<Task> tasks) {
+
+    DatabaseHandler.getDatabase().then((db) {
+      tasks.forEach((task) {
+        TaskRepository.delete(task, db).then((value) => LogUtils.info("Task Removed!"));
+      });
+    });
+  }
+
+  void _updateTask(List<Task> tasks) {
+    DatabaseHandler.getDatabase().then((db) {
+      tasks.forEach((task) {
+        TaskRepository.update(task, db).then((value) => LogUtils.info("Task Updated!"));
+      });
+    });
   }
 
 }

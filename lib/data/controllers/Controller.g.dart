@@ -84,6 +84,21 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$tasksLoadedAtom = Atom(name: 'ControllerBase.tasksLoaded');
+
+  @override
+  bool get tasksLoaded {
+    _$tasksLoadedAtom.reportRead();
+    return super.tasksLoaded;
+  }
+
+  @override
+  set tasksLoaded(bool value) {
+    _$tasksLoadedAtom.reportWrite(value, super.tasksLoaded, () {
+      super.tasksLoaded = value;
+    });
+  }
+
   final _$itemsAtom = Atom(name: 'ControllerBase.items');
 
   @override
@@ -169,6 +184,50 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
+  void setItemCheckStatus(bool status, int index) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setItemCheckStatus');
+    try {
+      return super.setItemCheckStatus(status, index);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void dispose() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.dispose');
+    try {
+      return super.dispose();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeList(int index) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.removeList');
+    try {
+      return super.removeList(index);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void cancelLastItemRemoved(int index) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.cancelLastItemRemoved');
+    try {
+      return super.cancelLastItemRemoved(index);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 clicks: ${clicks},
@@ -176,6 +235,7 @@ name: ${name},
 description: ${description},
 dateTodo: ${dateTodo},
 taskSaved: ${taskSaved},
+tasksLoaded: ${tasksLoaded},
 items: ${items}
     ''';
   }

@@ -1,8 +1,4 @@
-import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
-import 'package:fiap_trabalho_flutter/data/controllers/ItemModel.dart';
-import 'package:fiap_trabalho_flutter/data/model/Task.dart';
-import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/NewTask.dart';
@@ -20,14 +16,10 @@ class ListTasks extends StatefulWidget {
 
 class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
 
-  List<Task> _tasks = [];
-  List<Task>  _lastItemRemoved = [];
-  int _lastItemListRemoved = -1;
-  bool _mustUpdateTasks = false;
-
-  bool _loading = false;
-
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _lastItemRemovedIndex = -1;
+
+  Controller mController;
 
   @override void initState() {
     super.initState();
@@ -39,60 +31,46 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     LogUtils.info('state = $state');
-    if (state == AppLifecycleState.paused) {
-      if (_lastItemRemoved.length > 0) {
-        _deleteTask(_lastItemRemoved);
-        _lastItemRemoved.clear();
-        _lastItemListRemoved = -1;
-      }
-      if (_mustUpdateTasks && _tasks.length > 0) {
-        _updateTask(_tasks);
-        _mustUpdateTasks = false;
-      }
-    }
+    if (state == AppLifecycleState.paused)
+      mController.dispose();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    if (_lastItemRemoved.length > 0)
-      _deleteTask(_lastItemRemoved);
-    if (_mustUpdateTasks && _tasks.length > 0)
-      _updateTask(_tasks);
+    mController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    var controller = Provider.of<Controller>(context);
-    controller.loadTaskList();
+    mController = Provider.of<Controller>(context);
+    mController.loadTaskList();
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: appDarkGreyColor,
-      body: _buildBody(controller),
-      floatingActionButton: _buildFloatingButton(context)
+      body: Observer(builder: (_) {
+        if (mController.tasksLoaded) {
+          return _buildContent();
+        } else {
+          return new Center(
+            child: new CircularProgressIndicator(),
+          );
+        }
+      }),
+      floatingActionButton: Observer(builder: (_) {
+        if (mController.tasksLoaded)
+          return _buildFloatingButton(context);
+        else
+          return SizedBox(height: 20);
+
+      })
     );
   }
 
-  // Body
-  Widget _buildBody(Controller controller) {
-    if (_loading) {
-      return new Center(
-        child: new CircularProgressIndicator(),
-      );
-    }
-    else {
-      return Stack(
-        children: <Widget>[
-          _buildContent(controller),
-        ],
-      );
-    }
-  }
-
-  Widget _buildContent(Controller controller) {
+  Widget _buildContent() {
     return SafeArea(
         child: Column(
           children: <Widget> [
@@ -112,7 +90,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
               )
             ),
             Expanded(
-              child: _buildList(controller.items)
+              child: _buildList()
             )
           ]
       )
@@ -126,19 +104,19 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildList(List<Task> list) {
+  Widget _buildList() {
     return Observer(builder: (_) {
       return ListView.builder(
           padding: EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
-          itemCount: list.length,
+          itemCount: mController.items.length,
           itemBuilder: (context, index) =>
-              _buildDismissibleTaskList(context, index, list)
+              _buildDismissibleTaskList(context, index)
       );
     });
   }
 
   // Dismissible Task list
-  Widget _buildDismissibleTaskList(BuildContext context, int index, List<Task> list) {
+  Widget _buildDismissibleTaskList(BuildContext context, int index) {
     return Dismissible(
       key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
       background: Container(
@@ -149,89 +127,56 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
           )
       ),
       direction: DismissDirection.startToEnd,
-      child: _buildTaskList(context, index, list),
-      onDismissed: (direction) => _removeTask(direction, index, list),
+      child: _buildTaskList(context, index),
+      onDismissed: (direction) => _removeTask(direction, index),
     );
   }
 
   // Task List
-  Widget _buildTaskList(BuildContext context, int index, List<Task> list) {
-    return CheckboxListTile(
-        title: Text(list[index].title),
-        subtitle: Text(list[index].description),
-        value: list[index].status == 1,
-        onChanged: (checked) {
-          setState(() {
-            if (checked)
-              list[index].status = 1;
-            else
-              list[index].status = 0;
-          });
-        }
-    );
-  }
-
-  void _removeTask(DismissDirection direction, int index, List<Task> list) {
-    setState(() {
-      _lastItemRemoved.add(list[index]);
-      _lastItemListRemoved = index;
-      list.removeAt(index);
-      final snack = _snackBar();
-      _scaffoldKey.currentState.showSnackBar(snack);
+  Widget _buildTaskList(BuildContext context, int index) {
+    return Observer(builder: (_) {
+      return CheckboxListTile(
+          title: Text(mController.items[index].title),
+          subtitle: Text(mController.items[index].description),
+          value: mController.items[index].status == 1,
+          onChanged: (checked) => mController.setItemCheckStatus(checked, index)
+      );
     });
   }
 
-  Widget _snackBar() {
+  void _removeTask(DismissDirection direction, int index) {
+    mController.removeList(index);
+    _lastItemRemovedIndex = index;
+    final snack = _snackBar(mController.removedTaskList.last.title);
+    _scaffoldKey.currentState.showSnackBar(snack);
+  }
+
+  Widget _snackBar(String title) {
     return SnackBar(
-      content: Text("Tarefa ${_lastItemRemoved[0].title} removido da lista!"),
+      content: Text("Tarefa $title removido da lista!"),
       action: SnackBarAction(
-        label: "Desfazer", onPressed: _restoreList,
+        label: "Desfazer", onPressed: () =>
+          mController.cancelLastItemRemoved(_lastItemRemovedIndex),
       ),
       duration: Duration(seconds: 3),
     );
   }
 
-  void _restoreList() {
-    setState(() {
-      _tasks.insert(_lastItemListRemoved, _lastItemRemoved[0]);
-      _lastItemRemoved.removeLast();
-    });
-  }
-
   // Floating ADD Task button
   Widget _buildFloatingButton(BuildContext context) {
-    if (!_loading) {
-      return FloatingActionButton(
-        onPressed: () async {
-          bool mustUpdateTasks = await Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => NewTask())
-          );
-          if (mustUpdateTasks != null && mustUpdateTasks) {
-            _loading = true;
-            //_loadTaskList();
-          }
-        },
-        tooltip: 'Criar Tarefa',
-        child: Icon(Icons.add),
-      );
-    } else return SizedBox(height: 20);
-  }
-
-  void _deleteTask(List<Task> tasks) {
-
-    DatabaseHandler.getDatabase().then((db) {
-      tasks.forEach((task) {
-        TaskRepository.delete(task, db).then((value) => LogUtils.info("Task Removed!"));
-      });
-    });
-  }
-
-  void _updateTask(List<Task> tasks) {
-    DatabaseHandler.getDatabase().then((db) {
-      tasks.forEach((task) {
-        TaskRepository.update(task, db).then((value) => LogUtils.info("Task Updated!"));
-      });
-    });
+    return FloatingActionButton(
+      onPressed: () async {
+        bool mustUpdateTasks = await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => NewTask())
+        );
+        if (mustUpdateTasks != null && mustUpdateTasks) {
+          //_loading = true;
+          //_loadTaskList();
+        }
+      },
+      tooltip: 'Criar Tarefa',
+      child: Icon(Icons.add),
+    );
   }
 
 }
