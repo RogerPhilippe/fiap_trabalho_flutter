@@ -2,6 +2,7 @@ import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,16 @@ void main() {
   getIt.registerSingleton<UserSession>(UserSession());
 
   debugPaintSizeEnabled = false;
-  runApp(_Main());
+  runApp(
+      MaterialApp(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate
+        ],
+        supportedLocales: [const Locale('pt', 'BR')],
+        home: _Main(),
+      ),
+  );
 }
 
 class _Main extends StatelessWidget {

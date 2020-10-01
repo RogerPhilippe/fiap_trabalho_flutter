@@ -57,13 +57,13 @@ mixin _$Controller on ControllerBase, Store {
   final _$dateTodoAtom = Atom(name: 'ControllerBase.dateTodo');
 
   @override
-  String get dateTodo {
+  int get dateTodo {
     _$dateTodoAtom.reportRead();
     return super.dateTodo;
   }
 
   @override
-  set dateTodo(String value) {
+  set dateTodo(int value) {
     _$dateTodoAtom.reportWrite(value, super.dateTodo, () {
       super.dateTodo = value;
     });
@@ -114,6 +114,13 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$saveTaskAsyncAction = AsyncAction('ControllerBase.saveTask');
+
+  @override
+  Future<bool> saveTask() {
+    return _$saveTaskAsyncAction.run(() => super.saveTask());
+  }
+
   final _$ControllerBaseActionController =
       ActionController(name: 'ControllerBase');
 
@@ -151,22 +158,11 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
-  void setDateTodo(String dateTodoValue) {
+  void setDateTodo(int dateTodoValue) {
     final _$actionInfo = _$ControllerBaseActionController.startAction(
         name: 'ControllerBase.setDateTodo');
     try {
       return super.setDateTodo(dateTodoValue);
-    } finally {
-      _$ControllerBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void saveTask() {
-    final _$actionInfo = _$ControllerBaseActionController.startAction(
-        name: 'ControllerBase.saveTask');
-    try {
-      return super.saveTask();
     } finally {
       _$ControllerBaseActionController.endAction(_$actionInfo);
     }

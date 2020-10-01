@@ -1,7 +1,9 @@
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
+import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/NewTask.dart';
+import 'package:fiap_trabalho_flutter/screens/utils/DateUtils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -135,9 +137,10 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   // Task List
   Widget _buildTaskList(BuildContext context, int index) {
     return Observer(builder: (_) {
+      Task task = mController.items[index];
       return CheckboxListTile(
           title: Text(mController.items[index].title),
-          subtitle: Text(mController.items[index].description),
+          subtitle: Text("${DateUtils().getFormattedDate(task.todoDate)} ${mController.items[index].description}"),
           value: mController.items[index].status == 1,
           onChanged: (checked) => mController.setItemCheckStatus(checked, index)
       );
@@ -166,13 +169,9 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   Widget _buildFloatingButton(BuildContext context) {
     return FloatingActionButton(
       onPressed: () async {
-        bool mustUpdateTasks = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => NewTask())
-        );
-        if (mustUpdateTasks != null && mustUpdateTasks) {
-          //_loading = true;
-          //_loadTaskList();
-        }
+        mController.dispose();
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (context) => NewTask()));
       },
       tooltip: 'Criar Tarefa',
       child: Icon(Icons.add),

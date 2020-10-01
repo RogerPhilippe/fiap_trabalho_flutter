@@ -1,8 +1,10 @@
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
+import 'package:fiap_trabalho_flutter/screens/ListTasks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import './utils/DateUtils.dart';
 
 class NewTask extends StatefulWidget {
   @override
@@ -13,36 +15,37 @@ class NewTask extends StatefulWidget {
 
 class _NewTaskState extends State<NewTask> {
 
+  Controller mController;
+
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
   TextEditingController taskTitleController = TextEditingController();
   TextEditingController taskDescriptionController = TextEditingController();
   TextEditingController taskTodoDateController = TextEditingController();
-  bool _loading = true;
 
   @override
   Widget build(BuildContext context) {
 
-    var controller = Provider.of<Controller>(context);
+    mController = Provider.of<Controller>(context);
 
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
       backgroundColor: appDarkGreyColor,
-      body: _buildBody(controller),
+      body: _buildBody(),
     );
   }
 
   // Body
-  Widget _buildBody(Controller controller) {
+  Widget _buildBody() {
     return Stack(
       children: <Widget>[
-        _buildContent(controller),
+        _buildContent(),
       ],
     );
   }
 
-  Widget _buildContent(Controller controller) {
+  Widget _buildContent() {
     return SafeArea(
       child: Column(
         children: [
@@ -63,14 +66,14 @@ class _NewTaskState extends State<NewTask> {
           ),
           SingleChildScrollView(
             padding: EdgeInsets.only(top: 12.0, bottom: 12.0),
-            child: _formContent(controller),
+            child: _formContent(),
           )
         ],
       ),
     );
   }
 
-  Widget _formContent(Controller controller) {
+  Widget _formContent() {
     return Container(
       child: Form(
         key: _formKey,
@@ -88,7 +91,7 @@ class _NewTaskState extends State<NewTask> {
                     )
                 ),
                 controller: taskTitleController,
-                onChanged: controller.setName,
+                onChanged: mController.setName,
                 // ignore: missing_return
                 validator: (value) {
                   if (value.isEmpty) {
@@ -109,29 +112,18 @@ class _NewTaskState extends State<NewTask> {
                     )
                 ),
                 controller: taskDescriptionController,
-                onChanged: controller.setDescription,
+                onChanged: mController.setDescription,
               ),
             ),
             Container(
               padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-              child: TextField(
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                    hintText: "Data",
-                    hintStyle: TextStyle(color: Colors.orange),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.orange)
-                    )
-                ),
-                controller: taskTodoDateController,
-                onChanged: controller.setDateTodo,
-              ),
+              child: DateUtils().dateField(mController)
             ),
             Container(
               padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
               height: 90.0,
               width: double.infinity,
-              child: _buildSaveBtn(controller)
+              child: _buildSaveBtn()
             ),
           ],
         ),
@@ -146,11 +138,15 @@ class _NewTaskState extends State<NewTask> {
     );
   }
 
-  Widget _buildSaveBtn(Controller controller) {
+  Widget _buildSaveBtn() {
     return RaisedButton(
         onPressed: () {
           if(_formKey.currentState.validate()) {
-            controller.saveTask();
+            mController.saveTask().then((status) => {
+              if(status)
+                Navigator.of(context)
+                    .pushReplacement(MaterialPageRoute(builder: (context) => ListTasks()))
+            });
           }
         },
         child: Text(

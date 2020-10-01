@@ -2,6 +2,7 @@ import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:mobx/mobx.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../DatabaseHandler.dart';
 
@@ -20,7 +21,7 @@ abstract class ControllerBase with Store {
   @observable
   String description = "";
   @observable
-  String dateTodo = "";
+  int dateTodo = 0;
   @observable
   bool taskSaved = false;
   @observable
@@ -43,29 +44,36 @@ abstract class ControllerBase with Store {
     description = descriptionValue;
   }
   @action
-  void setDateTodo(String dateTodoValue) {
+  void setDateTodo(int dateTodoValue) {
     dateTodo = dateTodoValue;
   }
 
   @action
-  void saveTask() {
+  Future<bool> saveTask() async {
     var id = DateTime.now().millisecondsSinceEpoch.toString();
     var dateCreated = DateTime.now().millisecondsSinceEpoch;
     var dateLastUpdate = DateTime.now().millisecondsSinceEpoch;
-    final task = new Task(id, name, description, dateCreated, 0, dateLastUpdate, 0);
-    _saveTask(task);
+    final task = new Task(id, name, description, dateCreated, dateTodo, dateLastUpdate, 0);
+    return await _saveTask(task);
   }
 
-  void _saveTask(Task task) {
+  Future<bool> _saveTask(Task task) async {
 
-    DatabaseHandler.getDatabase().then((db) {
-      TaskRepository.insert(task, db).then((value) {
-        LogUtils.info("Task salva!");
-      }).catchError((onError) {
+    Database db = await DatabaseHandler.getDatabase();
+
+    if (db != null) {
+      int result = await TaskRepository.insert(task, db);
+      if (result == null || result < 0) {
         LogUtils.error('Erro ao tentar salvar');
-        LogUtils.error(onError);
-      });
-    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
+        return false;
+      } else {
+        LogUtils.info("Task salva!");
+        return true;
+      }
+    } else {
+      LogUtils.error('Erro ao abrir banco de dados!');
+      return false;
+    }
 
   }
 
@@ -108,7 +116,7 @@ abstract class ControllerBase with Store {
     clicks = 0;
     name = "";
     description = "";
-    dateTodo = "";
+    dateTodo = 0;
     taskSaved = false;
     tasksLoaded = false;
     items = ObservableList<Task>();
