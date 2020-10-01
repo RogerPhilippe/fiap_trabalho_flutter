@@ -65,7 +65,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                   child: Row(
                       children: [
                         GestureDetector(
-                          child: Icon(Icons.arrow_back, size: 28, color:  Colors.orange),
+                          child: Icon(Icons.arrow_back, size: 28, color:  mainColor),
                           onTap: () => { Navigator.of(context).pop() },
                         ),
                         SizedBox(width: 24),
@@ -149,7 +149,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   Widget _buildDefaultText(String text, double size) {
     return Text(
         text,
-        style: TextStyle(color: Colors.orange, fontSize: size)
+        style: TextStyle(color: mainColor, fontSize: size)
     );
   }
 
@@ -158,9 +158,9 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         onPressed: func,
         child: Text(
             text,
-            style: TextStyle(color: Colors.white, fontSize: 18.0)
+            style: TextStyle(color: mainAccentColor, fontSize: 18.0)
         ),
-        color: Colors.orange
+        color: mainColor
     );
   }
 

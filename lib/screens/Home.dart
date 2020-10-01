@@ -141,9 +141,9 @@ class _HomeState extends State<Home> {
         onPressed: func,
         child: Text(
             text,
-            style: TextStyle(color: Colors.white, fontSize: 18.0)
+            style: TextStyle(color: mainAccentColor, fontSize: 18.0)
         ),
-        color: Colors.orange
+        color: mainColor
     );
   }
 
@@ -151,7 +151,7 @@ class _HomeState extends State<Home> {
     return Container(
       padding: EdgeInsets.only(bottom: 20),
       child: Text(text,
-          style: TextStyle(color: Colors.orange, fontSize: size)),
+          style: TextStyle(color: mainColor, fontSize: size)),
     );
   }
 

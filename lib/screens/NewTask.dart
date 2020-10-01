@@ -54,7 +54,7 @@ class _NewTaskState extends State<NewTask> {
               child: Row(
                   children: [
                     GestureDetector(
-                      child: Icon(Icons.arrow_back, size: 28, color:  Colors.orange),
+                      child: Icon(Icons.arrow_back, size: 28, color: mainColor),
                       onTap: () => { Navigator.of(context).pop() },
                     ),
                     SizedBox(width: 24),
@@ -85,9 +85,9 @@ class _NewTaskState extends State<NewTask> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     hintText: "Tarefa",
-                    hintStyle: TextStyle(color: Colors.orange),
+                    hintStyle: TextStyle(color: mainColor),
                     focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.orange)
+                        borderSide: BorderSide(color: mainColor)
                     )
                 ),
                 controller: taskTitleController,
@@ -106,9 +106,9 @@ class _NewTaskState extends State<NewTask> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     hintText: "Detalhes",
-                    hintStyle: TextStyle(color: Colors.orange),
+                    hintStyle: TextStyle(color: mainColor),
                     focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.orange)
+                        borderSide: BorderSide(color: mainColor)
                     )
                 ),
                 controller: taskDescriptionController,
@@ -134,7 +134,7 @@ class _NewTaskState extends State<NewTask> {
   Widget _buildDefaultText(String text, double size) {
     return Container(
       child: Text(text,
-          style: TextStyle(color: Colors.orange, fontSize: size)),
+          style: TextStyle(color: mainColor, fontSize: size)),
     );
   }
 
@@ -151,9 +151,9 @@ class _NewTaskState extends State<NewTask> {
         },
         child: Text(
             "SALVAR",
-            style: TextStyle(color: Colors.white, fontSize: 18.0)
+            style: TextStyle(color: mainAccentColor, fontSize: 18.0)
         ),
-        color: Colors.orange
+        color: mainColor
     );
   }
 

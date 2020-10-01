@@ -58,7 +58,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
           return _buildContent();
         } else {
           return new Center(
-            child: new CircularProgressIndicator(),
+            child: new CircularProgressIndicator()
           );
         }
       }),
@@ -81,7 +81,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
               child: Row(
                 children: [
                   GestureDetector(
-                    child: Icon(Icons.arrow_back, size: 28, color:  Colors.orange),
+                    child: Icon(Icons.arrow_back, size: 28, color:  mainColor),
                     onTap: () => { Navigator.of(context).pop() },
                   ),
                   SizedBox(width: 24),
@@ -102,7 +102,7 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   Widget _buildDefaultText(String text, double size) {
     return Text(
         text,
-        style: TextStyle(color: Colors.orange, fontSize: size)
+        style: TextStyle(color: mainColor, fontSize: size)
     );
   }
 
@@ -139,10 +139,12 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
     return Observer(builder: (_) {
       Task task = mController.items[index];
       return CheckboxListTile(
-          title: Text(mController.items[index].title),
-          subtitle: Text("${DateUtils().getFormattedDate(task.todoDate)} ${mController.items[index].description}"),
-          value: mController.items[index].status == 1,
-          onChanged: (checked) => mController.setItemCheckStatus(checked, index)
+        title: Text(mController.items[index].title),
+        subtitle: Text("${DateUtils().getFormattedDate(task.todoDate)} ${mController.items[index].description}"),
+        value: mController.items[index].status == 1,
+        onChanged: (checked) => mController.setItemCheckStatus(checked, index),
+        activeColor: mainColor,
+        checkColor: mainAccentColor,
       );
     });
   }
@@ -168,6 +170,8 @@ class _ListTasksState extends State<ListTasks> with WidgetsBindingObserver {
   // Floating ADD Task button
   Widget _buildFloatingButton(BuildContext context) {
     return FloatingActionButton(
+      backgroundColor: mainColor,
+      foregroundColor: mainAccentColor,
       onPressed: () async {
         mController.dispose();
         Navigator.of(context)

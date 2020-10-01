@@ -22,7 +22,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate
         ],
         supportedLocales: [const Locale('pt', 'BR')],
-        home: _Main(),
+        home: _Main()
       ),
   );
 }

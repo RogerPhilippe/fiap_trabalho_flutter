@@ -1,5 +1,6 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
+import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -17,9 +18,9 @@ class DateUtils {
         },
         decoration: InputDecoration(
             hintText: "Data",
-            hintStyle: TextStyle(color: Colors.orange),
+            hintStyle: TextStyle(color: mainColor),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.orange)
+                borderSide: BorderSide(color: mainColor)
             )
         ),
         onShowPicker: (context, currentValue) {

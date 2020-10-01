@@ -2,7 +2,6 @@ import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 
 class About extends StatefulWidget {
 
@@ -49,7 +48,7 @@ class _AboutState extends State<About> with WidgetsBindingObserver {
                   child: Row(
                       children: [
                         GestureDetector(
-                          child: Icon(Icons.arrow_back, size: 28, color:  Colors.orange),
+                          child: Icon(Icons.arrow_back, size: 28, color:  mainColor),
                           onTap: () => { Navigator.of(context).pop() },
                         ),
                         SizedBox(width: 24),
@@ -58,16 +57,6 @@ class _AboutState extends State<About> with WidgetsBindingObserver {
                         )
                       ]
                   )
-              ),
-              Observer(builder: (_){
-                return Text("${controller.clicks}");
-              }),
-              RaisedButton(
-                  onPressed: () {
-                    controller.increment();
-                    },
-                  child: Text("Click"),
-                  color: Colors.orange
               )
             ]
         )
@@ -77,7 +66,7 @@ class _AboutState extends State<About> with WidgetsBindingObserver {
   Widget _buildDefaultText(String text, double size) {
     return Text(
         text,
-        style: TextStyle(color: Colors.orange, fontSize: size)
+        style: TextStyle(color: mainColor, fontSize: size)
     );
   }
 
