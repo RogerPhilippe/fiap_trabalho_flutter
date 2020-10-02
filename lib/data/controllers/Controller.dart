@@ -1,6 +1,9 @@
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
+import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
+import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mobx/mobx.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -26,6 +29,8 @@ abstract class ControllerBase with Store {
   bool taskSaved = false;
   @observable
   bool tasksLoaded = false;
+  @observable
+  bool logged = false;
   @observable
   ObservableList<Task> items = ObservableList<Task>();
   List<Task> updateListTask = [];
@@ -152,6 +157,47 @@ abstract class ControllerBase with Store {
         TaskRepository.update(task, db).then((value) => LogUtils.info("Task Updated!"));
       });
     });
+  }
+
+  @action
+  void firebaseLogin(UserSession userSession) {
+
+    final auth = FirebaseAuth.instance;
+
+    auth.currentUser()
+        .then((firebaseUser) {
+      if (firebaseUser == null || firebaseUser.uid == null || firebaseUser.uid.isEmpty)
+        _loginFirebase(auth, userSession);
+      else {
+        userSession.userToken = firebaseUser.uid;
+        LogUtils.info("Logado no firebase!");
+      }
+    }).catchError((onError) => _loginFirebase(auth, userSession));
+
+    DatabaseHandler.getDatabase().then((db) {
+      UserRepository.findAll(db).then((users) {
+        userSession.userID = users[0].id;
+        userSession.name = users[0].name;
+        userSession.email = users[0].email;
+
+        logged = true;
+      }).catchError((onError) {
+        LogUtils.error('Error find user.');
+        logged = false;
+      });
+    }).catchError((onError) {
+      LogUtils.error('Error try open db.');
+      logged = false;
+    });
+  }
+
+  void _loginFirebase(FirebaseAuth auth, UserSession userSession) {
+
+    LogUtils.info('Fazendo login no firebase.');
+
+    auth.signInWithEmailAndPassword(email: "system_user@email.com", password: "syste@2020")
+        .then((firebaseUser) => userSession.userToken = firebaseUser.uid)
+        .catchError((onError) => LogUtils.error('Erro ao fazer login firebase.'));
   }
 
 }

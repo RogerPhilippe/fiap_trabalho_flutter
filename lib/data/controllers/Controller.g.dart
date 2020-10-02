@@ -99,6 +99,21 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$loggedAtom = Atom(name: 'ControllerBase.logged');
+
+  @override
+  bool get logged {
+    _$loggedAtom.reportRead();
+    return super.logged;
+  }
+
+  @override
+  set logged(bool value) {
+    _$loggedAtom.reportWrite(value, super.logged, () {
+      super.logged = value;
+    });
+  }
+
   final _$itemsAtom = Atom(name: 'ControllerBase.items');
 
   @override
@@ -224,6 +239,17 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
+  void firebaseLogin(UserSession userSession) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.firebaseLogin');
+    try {
+      return super.firebaseLogin(userSession);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 clicks: ${clicks},
@@ -232,6 +258,7 @@ description: ${description},
 dateTodo: ${dateTodo},
 taskSaved: ${taskSaved},
 tasksLoaded: ${tasksLoaded},
+logged: ${logged},
 items: ${items}
     ''';
   }

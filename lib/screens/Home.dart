@@ -1,14 +1,13 @@
-import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
-import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
-import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
+import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/About.dart';
 import 'package:fiap_trabalho_flutter/screens/ListTasks.dart';
 import 'package:fiap_trabalho_flutter/screens/Settings.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 import 'NewTask.dart';
 
@@ -22,67 +21,42 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
-  bool _loading = true;
 
   final userSession = GetIt.instance.get<UserSession>();
+  Controller mController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    final auth = FirebaseAuth.instance;
-
-    auth.currentUser()
-        .then((firebaseUser) {
-      if (firebaseUser == null || firebaseUser.uid == null || firebaseUser.uid.isEmpty)
-        _loginFirebase(auth);
-      else {
-        userSession.userToken = firebaseUser.uid;
-        LogUtils.info("Logado no firebase!");
-      }
-    }).catchError((onError) => _loginFirebase(auth));
-
-    DatabaseHandler.getDatabase().then((db) {
-     UserRepository.findAll(db).then((users) {
-       userSession.userID = users[0].id;
-       userSession.name = users[0].name;
-       userSession.email = users[0].email;
-       
-       _showContent();
-     }).catchError((onError) {
-       LogUtils.error('Error find user.');
-       _showContent();
-     });
-    }).catchError((onError) {
-      LogUtils.error('Error try open db.');
-      _showContent();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
 
+    mController = Provider.of<Controller>(context);
+    mController.loadTaskList();
+
+    mController.firebaseLogin(userSession);
+
     return Scaffold(
       backgroundColor: appDarkGreyColor,
       key: _scaffoldKey,
-      body: _buildBody(),
+      body: Observer(builder: (_) {
+        if (!mController.logged) {
+          return new Center(
+            child: new CircularProgressIndicator(),
+          );
+        } else {
+          return Stack(
+            children: <Widget>[
+              _buildContent(),
+            ],
+          );
+        }
+      })
     );
-  }
-
-  // Body
-  Widget _buildBody() {
-    if (_loading) {
-      return new Center(
-        child: new CircularProgressIndicator(),
-      );
-    } else {
-     return Stack(
-      children: <Widget>[
-        _buildContent(),
-      ],
-    );
-    }
   }
 
   Widget _buildContent() {
@@ -153,20 +127,6 @@ class _HomeState extends State<Home> {
       child: Text(text,
           style: TextStyle(color: mainColor, fontSize: size)),
     );
-  }
-
-  void _showContent() {
-    _loading = false;
-    setState(() => print(''));
-  }
-
-  void _loginFirebase(FirebaseAuth auth) {
-
-    LogUtils.info('Fazendo login no firebase.');
-
-    auth.signInWithEmailAndPassword(email: "system_user@email.com", password: "syste@2020")
-        .then((firebaseUser) => userSession.userToken = firebaseUser.uid)
-        .catchError((onError) => LogUtils.error('Erro ao fazer login firebase.'));
   }
 
 }
