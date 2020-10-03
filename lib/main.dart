@@ -1,5 +1,6 @@
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,6 +32,9 @@ class _Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    Firebase.initializeApp();
+
     return MultiProvider(
       providers: [
         Provider<Controller>(create: (_) => Controller())

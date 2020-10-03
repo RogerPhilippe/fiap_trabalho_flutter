@@ -16,4 +16,8 @@ class UserRepository {
     return await UserDAO.delete(user, db);
   }
 
+  static Future<int> deleteAll(Database db) async {
+    return await UserDAO.deleteAll(db);
+  }
+
 }

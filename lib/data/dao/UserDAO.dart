@@ -35,4 +35,9 @@ class UserDAO {
     );
   }
 
+  static Future<int> deleteAll(Database db) async {
+
+    return await db.delete(TablesTO.userTable);
+  }
+
 }

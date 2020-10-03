@@ -20,4 +20,8 @@ class TaskRepository {
     return await TaskDAO.delete(task, db);
   }
 
+  static Future<int> deleteAll(Database db) async {
+    return await TaskDAO.deleteAll(db);
+  }
+
 }

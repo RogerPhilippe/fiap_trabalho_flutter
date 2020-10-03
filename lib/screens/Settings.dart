@@ -1,15 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fiap_trabalho_flutter/data/DatabaseHandler.dart';
+import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/data/model/User.dart';
-import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
-import 'package:fiap_trabalho_flutter/data/service/FirebaseService.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:fiap_trabalho_flutter/screens/utils/DialogUtils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
 
@@ -28,16 +26,12 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   final _textFieldEmailController = TextEditingController();
 
   final userSession = GetIt.instance.get<UserSession>();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    Firebase.initializeApp();
-  }
+  Controller mController;
 
   @override
   Widget build(BuildContext context) {
+
+    mController = Provider.of<Controller>(context);
 
     return Scaffold(
         key: _scaffoldKey,
@@ -109,7 +103,8 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       child: _buildDefaultBtn("SALVAR NA NUVEM", () {
                         if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
-                        }
+                        } else
+                          DialogUtils.makeYesNoDialog(context, "Deseja salvar tarefas na nuvem?", () => mController.saveTaskFirebase(context, userSession));
                       }),
                     ),
                     Container(
@@ -119,23 +114,30 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       child: _buildDefaultBtn("BAIXAR DA NUVEM", () {
                         if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
-                        }
+                        } else
+                          DialogUtils.makeYesNoDialog(context, "Deseja baixar tarefas da nuvem?", () => mController.getTasks(context, userSession));
                       }),
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("APAGAR TAREFAS", () => {
-
+                      child: _buildDefaultBtn("APAGAR TAREFAS", () {
+                        if (userSession.name == null || userSession.name.isEmpty) {
+                          _showMsgMustCreateUser();
+                        } else
+                          DialogUtils.makeYesNoDialog(context, "Deseja apagar todas as tarefas?", () => mController.removeTasks(context, userSession));
                       }),
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("APAGAR USUÁRIO", () => {
-
+                      child: _buildDefaultBtn("APAGAR USUÁRIO", () {
+                        if (userSession.name == null || userSession.name.isEmpty) {
+                          _showMsgMustCreateUser();
+                        } else
+                          DialogUtils.makeYesNoDialog(context, "Deseja remover o usuário?", () => mController.removeUser(context, userSession));
                       }),
                     ),
                   ],
@@ -228,7 +230,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                           name.toUpperCase(),
                           email.toLowerCase()
                       );
-                      _saveFirebaseUser(user);
+                      mController.saveFirebaseUser(user, userSession);
                       Navigator.of(context).pop();
                     }
                   },
@@ -241,52 +243,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
             ),
           );
         });
-  }
-
-  void _saveFirebaseUser(User user) {
-
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    FirebaseService.findUserFirestore(user, firestore).then((documentSnapshot) {
-      if (documentSnapshot != null && documentSnapshot.docs.isNotEmpty) {
-
-        var doc = documentSnapshot.docs[0];
-        var data = doc.data();
-        LogUtils.info('Usuário já cadastrado na nuvem: ${data["userEmail"]}');
-        _saveUser(user);
-
-      } else {
-
-        LogUtils.info('Usuário não existe na nuvem.');
-
-          FirebaseService.saveFireStore(user, firestore)
-              .then((value) {
-            LogUtils.info('User saved in Firebase');
-                _saveUser(user);
-              })
-              .catchError((onError) {
-            LogUtils.error('Erro ao tentar salvar no firebase!');
-              });
-      }
-    }).catchError((onError) => LogUtils.error('Erro ao buscar usuário na nuvem.'));
-
-  }
-
-  void _saveUser(User user) {
-
-    DatabaseHandler.getDatabase().then((db) => {
-      UserRepository.insert(user, db).then((value) {
-        LogUtils.info('User saved local db!');
-        userSession.userID = user.id;
-        userSession.name = user.name;
-        userSession.email = user.email;
-      })
-          .catchError((onError, error) {
-        LogUtils.error('Error try save user!');
-        LogUtils.error(onError);
-        LogUtils.error(error);
-      })
-    }).catchError((onError) => LogUtils.error('Erro ao tentar abrir banco!'));
   }
 
   void _showMsgMustCreateUser() {

@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
+import 'package:fiap_trabalho_flutter/data/model/User.dart';
 import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
+import 'package:fiap_trabalho_flutter/data/service/FirebaseService.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
+import 'package:fiap_trabalho_flutter/screens/utils/DialogUtils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:mobx/mobx.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -183,11 +188,11 @@ abstract class ControllerBase with Store {
         logged = true;
       }).catchError((onError) {
         LogUtils.error('Error find user.');
-        logged = false;
+        logged = true;
       });
     }).catchError((onError) {
       LogUtils.error('Error try open db.');
-      logged = false;
+      logged = true;
     });
   }
 
@@ -198,6 +203,136 @@ abstract class ControllerBase with Store {
     auth.signInWithEmailAndPassword(email: "system_user@email.com", password: "syste@2020")
         .then((firebaseUser) => userSession.userToken = firebaseUser.uid)
         .catchError((onError) => LogUtils.error('Erro ao fazer login firebase.'));
+  }
+
+  @action
+  void saveFirebaseUser(User user, UserSession userSession) {
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    FirebaseService.findUserFirestore(user, firestore).then((documentSnapshot) {
+      if (documentSnapshot != null && documentSnapshot.docs.isNotEmpty) {
+
+        var doc = documentSnapshot.docs[0];
+        var data = doc.data();
+        LogUtils.info('Usuário já cadastrado na nuvem: ${data["userEmail"]}');
+        _saveUser(user, userSession);
+
+      } else {
+
+        LogUtils.info('Usuário não existe na nuvem.');
+
+        FirebaseService.saveFireStore(user, firestore)
+            .then((value) {
+          LogUtils.info('User saved in Firebase');
+          _saveUser(user, userSession);
+        })
+            .catchError((onError) {
+          LogUtils.error('Erro ao tentar salvar no firebase!');
+        });
+      }
+    }).catchError((onError) => LogUtils.error('Erro ao buscar usuário na nuvem.'));
+
+  }
+
+  void _saveUser(User user, UserSession userSession) {
+
+    DatabaseHandler.getDatabase().then((db) => {
+      UserRepository.insert(user, db).then((value) {
+        LogUtils.info('User saved local db!');
+        userSession.userID = user.id;
+        userSession.name = user.name;
+        userSession.email = user.email;
+      })
+          .catchError((onError, error) {
+        LogUtils.error('Error try save user!');
+        LogUtils.error(onError);
+        LogUtils.error(error);
+      })
+    }).catchError((onError) => LogUtils.error('Erro ao tentar abrir banco!'));
+  }
+
+  @action
+  void saveTaskFirebase(BuildContext context, UserSession userSession) {
+
+    DatabaseHandler.getDatabase().then((db) {
+      TaskRepository.tasks(db).then((taskList) async {
+
+        if (taskList != null) {
+
+          FirebaseFirestore firestore = FirebaseFirestore.instance;
+          await FirebaseService.removeTasks(userSession, firestore);
+          await FirebaseService.saveTasks(userSession, taskList, firestore);
+          DialogUtils.makeOkDialog(context, "Tarefas salvas na nuvem.");
+        }
+
+      }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
+    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
+
+  }
+
+  @action
+  void getTasks(BuildContext context, UserSession userSession) {
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DatabaseHandler.getDatabase().then((db) async {
+
+      await TaskRepository.deleteAll(db);
+
+      FirebaseService.getTasks(userSession, firestore).then((documentSnapshot) {
+
+        if (documentSnapshot != null && documentSnapshot.docs.isNotEmpty) {
+          documentSnapshot.docs.forEach((doc) async {
+            var task = Task(
+                doc["taskID"],
+                doc["taskTitle"],
+                doc["taskDescription"],
+                doc["taskDateCreated"],
+                doc["todoDate"],
+                doc["lastUpdateDate"],
+                doc["status"]
+            );
+            await TaskRepository.insert(task, db);
+          });
+
+          DialogUtils.makeOkDialog(context, "Tarefas baixadas.");
+
+        }
+      });
+
+    });
+
+  }
+
+  @action
+  void removeTasks(BuildContext context, UserSession userSession) {
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseService.removeTasks(userSession, firestore);
+
+    DatabaseHandler.getDatabase().then((db) async {
+      int rowsAffected = await TaskRepository.deleteAll(db);
+
+      if (rowsAffected > 0)
+        DialogUtils.makeOkDialog(context, "Tarefas excluidas.");
+
+    });
+  }
+
+  @action
+  void removeUser(BuildContext context, UserSession userSession) {
+
+    DatabaseHandler.getDatabase().then((db) async {
+      await UserRepository.deleteAll(db);
+      await TaskRepository.deleteAll(db);
+
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      FirebaseService.removeTasks(userSession, firestore);
+      FirebaseService.removeUser(userSession, firestore);
+
+      userSession.clearUser();
+
+    });
   }
 
 }

@@ -49,4 +49,9 @@ class TaskDAO {
     );
   }
 
+  static Future<int> deleteAll(Database db) async {
+
+    return await db.delete(TablesTO.taskTable);
+  }
+
 }

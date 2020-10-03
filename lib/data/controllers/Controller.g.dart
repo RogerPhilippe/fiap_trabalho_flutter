@@ -250,6 +250,61 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
+  void saveFirebaseUser(User user, UserSession userSession) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.saveFirebaseUser');
+    try {
+      return super.saveFirebaseUser(user, userSession);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void saveTaskFirebase(BuildContext context, UserSession userSession) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.saveTaskFirebase');
+    try {
+      return super.saveTaskFirebase(context, userSession);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void getTasks(BuildContext context, UserSession userSession) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.getTasks');
+    try {
+      return super.getTasks(context, userSession);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeTasks(BuildContext context, UserSession userSession) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.removeTasks');
+    try {
+      return super.removeTasks(context, userSession);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeUser(BuildContext context, UserSession userSession) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.removeUser');
+    try {
+      return super.removeUser(context, userSession);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 clicks: ${clicks},
