@@ -10,6 +10,7 @@ import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import 'NewTask.dart';
+import 'Utils.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -24,13 +25,6 @@ class _HomeState extends State<Home> {
 
   final userSession = GetIt.instance.get<UserSession>();
   Controller mController;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,40 +60,50 @@ class _HomeState extends State<Home> {
         child: Column(
           children: <Widget> [
             _buildDefaultText("Lista de Tarefas", 28),
-            _buildDefaultText("FIAP - Trabalho Final", 18),
+            _buildDefaultText("FIAP - Trabalho Flutter", 18),
             SizedBox(height: 20),
             Container(
-              padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+              padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
               height: 90.0,
               width: double.infinity,
-              child: _buildDefaultBtn("TAREFAS", () =>
+              child: _buildDefaultBtn("Tarefas", () =>
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => ListTasks()))
               ),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+              padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
               height: 90.0,
               width: double.infinity,
-              child: _buildDefaultBtn("CADASTRAR", () =>
+              child: _buildDefaultBtn("Criar Tarefa", () =>
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => NewTask()))
               ),
             ),
+
             Container(
-              padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+              padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
               height: 90.0,
               width: double.infinity,
-              child: _buildDefaultBtn("CONFIGURAÇÕES", () =>
+              child: _buildDefaultBtn("Utils", () =>
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => Utils()))
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
+              height: 90.0,
+              width: double.infinity,
+              child: _buildDefaultBtn("Configurações", () =>
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => Settings()))
               ),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+              padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
               height: 90.0,
               width: double.infinity,
-              child: _buildDefaultBtn("SOBRE", () =>
+              child: _buildDefaultBtn("Sobre", () =>
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => About()))
               ),

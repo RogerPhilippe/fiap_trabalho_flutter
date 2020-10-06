@@ -150,7 +150,7 @@ class _NewTaskState extends State<NewTask> {
           }
         },
         child: Text(
-            "SALVAR",
+            "Salvar",
             style: TextStyle(color: mainAccentColor, fontSize: 18.0)
         ),
         color: mainColor

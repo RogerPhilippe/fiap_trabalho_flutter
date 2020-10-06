@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fiap_trabalho_flutter/data/model/Task.dart';
 import 'package:fiap_trabalho_flutter/data/model/User.dart';
@@ -5,10 +7,12 @@ import 'package:fiap_trabalho_flutter/data/repository/TaskRepository.dart';
 import 'package:fiap_trabalho_flutter/data/repository/UserRepository.dart';
 import 'package:fiap_trabalho_flutter/data/service/FirebaseService.dart';
 import 'package:fiap_trabalho_flutter/data/service/LogUtils.dart';
+import 'package:fiap_trabalho_flutter/data/service/RequestHttpService.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/screens/utils/DialogUtils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -40,6 +44,18 @@ abstract class ControllerBase with Store {
   ObservableList<Task> items = ObservableList<Task>();
   List<Task> updateListTask = [];
   List<Task> removedTaskList = [];
+  @observable
+  String real;
+  @observable
+  String dollar;
+  @observable
+  String euro;
+  @observable
+  String bitCoin;
+  String realUnObservable;
+  String dollarUnObservable;
+  String euroUnObservable;
+  String bitCoinUnObservable;
 
   @action
   void increment() {
@@ -57,6 +73,26 @@ abstract class ControllerBase with Store {
   void setDateTodo(int dateTodoValue) {
     dateTodo = dateTodoValue;
   }
+
+  @action
+  void setReal(String value) {
+    realUnObservable = value;
+  }
+
+  @action
+  void setDollar(String value) {
+    dollarUnObservable = value;
+  }
+
+  @action
+  void setEuro(String value) {
+    euroUnObservable = value;
+  }
+  @action
+  void setBitCoin(String value) {
+    bitCoinUnObservable = value;
+  }
+
 
   @action
   Future<bool> saveTask() async {
@@ -332,6 +368,34 @@ abstract class ControllerBase with Store {
 
       userSession.clearUser();
 
+    });
+  }
+
+  @action
+  void exchangeService(String value) {
+
+    RequestHttpService.requestExchangesGet().then((response) {
+      if (response != null && response.statusCode == 200 &&
+          response.body != null && response.body.isNotEmpty) {
+
+        // json.decoder.convert(response.body)["USD"]// USD, EUR, BTC ["high"]
+        var usd = json.decoder.convert(response.body)["USD"];
+        var eur = json.decoder.convert(response.body)["EUR"];
+        var btc = json.decoder.convert(response.body)["BTC"];
+        if (value == "dollar") {
+          if (realUnObservable != null && realUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(realUnObservable);
+            var dollarDouble = realDouble / double.tryParse(usd["high"]);
+            dollar = dollarDouble.toString();
+            dollarUnObservable = dollarDouble.toString();
+          }
+          else if (dollarUnObservable != null && dollarUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(usd["high"]) * double.tryParse(dollarUnObservable);
+            real = realDouble.toString();
+            realUnObservable = realDouble.toString();
+          }
+        }
+      }
     });
   }
 

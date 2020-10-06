@@ -55,7 +55,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         child: Column(
             children: <Widget> [
               Container(
-                  padding: EdgeInsets.fromLTRB(16, 28, 16, 28),
+                  padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                   child: Row(
                       children: [
                         GestureDetector(
@@ -74,10 +74,10 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                 child: Column(
                   children: [
                     Container(
-                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("CADASTRAR EMAIL", () {
+                      child: _buildDefaultBtn("Cadastrar Email", () {
                         if (userSession.name == null || userSession.name.isEmpty)
                           _saveUserDialog(context);
                         else {
@@ -97,10 +97,10 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       }),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("SALVAR NA NUVEM", () {
+                      child: _buildDefaultBtn("Salvar na Nuvem", () {
                         if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
                         } else
@@ -108,10 +108,10 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       }),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("BAIXAR DA NUVEM", () {
+                      child: _buildDefaultBtn("Baixar da Nuvem", () {
                         if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
                         } else
@@ -119,10 +119,10 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       }),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("APAGAR TAREFAS", () {
+                      child: _buildDefaultBtn("Apagar Tarefas", () {
                         if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
                         } else
@@ -130,10 +130,10 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                       }),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 20.0),
+                      padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                       height: 90.0,
                       width: double.infinity,
-                      child: _buildDefaultBtn("APAGAR USUÁRIO", () {
+                      child: _buildDefaultBtn("Apagar Usuário", () {
                         if (userSession.name == null || userSession.name.isEmpty) {
                           _showMsgMustCreateUser();
                         } else

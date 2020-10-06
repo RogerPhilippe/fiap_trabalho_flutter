@@ -129,6 +129,66 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$realAtom = Atom(name: 'ControllerBase.real');
+
+  @override
+  String get real {
+    _$realAtom.reportRead();
+    return super.real;
+  }
+
+  @override
+  set real(String value) {
+    _$realAtom.reportWrite(value, super.real, () {
+      super.real = value;
+    });
+  }
+
+  final _$dollarAtom = Atom(name: 'ControllerBase.dollar');
+
+  @override
+  String get dollar {
+    _$dollarAtom.reportRead();
+    return super.dollar;
+  }
+
+  @override
+  set dollar(String value) {
+    _$dollarAtom.reportWrite(value, super.dollar, () {
+      super.dollar = value;
+    });
+  }
+
+  final _$euroAtom = Atom(name: 'ControllerBase.euro');
+
+  @override
+  String get euro {
+    _$euroAtom.reportRead();
+    return super.euro;
+  }
+
+  @override
+  set euro(String value) {
+    _$euroAtom.reportWrite(value, super.euro, () {
+      super.euro = value;
+    });
+  }
+
+  final _$bitCoinAtom = Atom(name: 'ControllerBase.bitCoin');
+
+  @override
+  String get bitCoin {
+    _$bitCoinAtom.reportRead();
+    return super.bitCoin;
+  }
+
+  @override
+  set bitCoin(String value) {
+    _$bitCoinAtom.reportWrite(value, super.bitCoin, () {
+      super.bitCoin = value;
+    });
+  }
+
   final _$saveTaskAsyncAction = AsyncAction('ControllerBase.saveTask');
 
   @override
@@ -178,6 +238,50 @@ mixin _$Controller on ControllerBase, Store {
         name: 'ControllerBase.setDateTodo');
     try {
       return super.setDateTodo(dateTodoValue);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setReal(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setReal');
+    try {
+      return super.setReal(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setDollar(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setDollar');
+    try {
+      return super.setDollar(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setEuro(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setEuro');
+    try {
+      return super.setEuro(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setBitCoin(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setBitCoin');
+    try {
+      return super.setBitCoin(value);
     } finally {
       _$ControllerBaseActionController.endAction(_$actionInfo);
     }
@@ -305,6 +409,17 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
+  void exchangeService(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.exchangeService');
+    try {
+      return super.exchangeService(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 clicks: ${clicks},
@@ -314,7 +429,11 @@ dateTodo: ${dateTodo},
 taskSaved: ${taskSaved},
 tasksLoaded: ${tasksLoaded},
 logged: ${logged},
-items: ${items}
+items: ${items},
+real: ${real},
+dollar: ${dollar},
+euro: ${euro},
+bitCoin: ${bitCoin}
     ''';
   }
 }
