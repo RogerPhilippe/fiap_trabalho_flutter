@@ -35,11 +35,19 @@ class _CEP extends State<CEP> with WidgetsBindingObserver {
       backgroundColor: appDarkGreyColor,
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
-      body: Stack(
-        children: [
-          _bodyBuilder()
-        ],
-      ),
+      body: Observer(builder: (_) {
+        if (mController.cepLoading) {
+          return Center(
+            child: CircularProgressIndicator()
+          );
+        } else {
+          return Stack(
+            children: [
+              _bodyBuilder()
+            ],
+          );
+        }
+      })
     );
   }
 

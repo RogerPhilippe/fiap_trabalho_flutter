@@ -76,6 +76,10 @@ abstract class ControllerBase with Store {
   @observable
   String cepBySearch = "";
   String mStreet;
+  @observable
+  bool cepLoading = true;
+  @observable
+  bool exchangeLoading = false;
 
   @action
   void increment() { clicks++; }
@@ -100,6 +104,7 @@ abstract class ControllerBase with Store {
 
   @action
   void setUF(String value) {
+    cepLoading = true;
     this.mUF = value;
     this.getCities();
   }
@@ -419,6 +424,8 @@ abstract class ControllerBase with Store {
   @action
   void exchangeService(String value) {
 
+    exchangeLoading = true;
+
     RequestHttpService.requestExchangesGet().then((response) {
       if (response != null && response.statusCode == 200 &&
           response.body != null && response.body.isNotEmpty) {
@@ -431,13 +438,13 @@ abstract class ControllerBase with Store {
           if (dollarToRealUnObservable != null && dollarToRealUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(dollarToRealUnObservable);
             var dollarDouble = realDouble / double.tryParse(usd["high"]);
-            dollar = dollarDouble.toString();
-            dollarUnObservable = dollarDouble.toString();
+            dollar = dollarDouble.toStringAsPrecision(3);
+            dollarUnObservable = dollarDouble.toStringAsPrecision(3);
           }
           else if (dollarUnObservable != null && dollarUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(usd["high"]) * double.tryParse(dollarUnObservable);
-            dollarToReal = realDouble.toString();
-            dollarToRealUnObservable = realDouble.toString();
+            dollarToReal = realDouble.toStringAsPrecision(3);
+            dollarToRealUnObservable = realDouble.toStringAsPrecision(3);
           }
         }
 
@@ -445,13 +452,13 @@ abstract class ControllerBase with Store {
           if (euroToRealUnObservable != null && euroToRealUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(euroToRealUnObservable);
             var euroDouble = realDouble / double.tryParse(eur["high"]);
-            euro = euroDouble.toString();
-            euroUnObservable = euroDouble.toString();
+            euro = euroDouble.toStringAsPrecision(3);
+            euroUnObservable = euroDouble.toStringAsPrecision(3);
           }
           else if (euroUnObservable != null && euroUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(eur["high"]) * double.tryParse(euroUnObservable);
-            euroToReal = realDouble.toString();
-            euroToRealUnObservable = realDouble.toString();
+            euroToReal = realDouble.toStringAsPrecision(3);
+            euroToRealUnObservable = realDouble.toStringAsPrecision(3);
           }
         }
 
@@ -459,8 +466,8 @@ abstract class ControllerBase with Store {
           if (btcToRealUnObservable != null && btcToRealUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(btcToRealUnObservable);
             var btcDouble = realDouble / double.tryParse(btc["high"]);
-            bitCoin = btcDouble.toString();
-            bitCoinUnObservable = btcDouble.toString();
+            bitCoin = btcDouble.toStringAsPrecision(3);
+            bitCoinUnObservable = btcDouble.toStringAsPrecision(3);
           }
           else if (bitCoinUnObservable != null && bitCoinUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(btc["high"]) * double.tryParse(bitCoinUnObservable);
@@ -469,11 +476,15 @@ abstract class ControllerBase with Store {
           }
         }
       }
+      exchangeLoading = false;
+
     });
   }
 
   @action
   void searchAddressByCep() {
+
+    cepLoading = true;
 
     RequestHttpService.searchAddressByCep(cep).then((addressResponse) {
 
@@ -486,6 +497,8 @@ abstract class ControllerBase with Store {
       } else
         address = "";
 
+      cepLoading = false;
+
     });
 
   }
@@ -493,39 +506,59 @@ abstract class ControllerBase with Store {
   @action
   void getUFs() {
 
+    mUFList.clear();
+
     RequestHttpService.requestUFs().then((ufList) {
 
       if (ufList != null && ufList.statusCode == 200 && ufList.body != null &&
           ufList.body.isNotEmpty) {
 
+        List<String> tmpUfList = [];
+
         var ufs = json.decoder.convert(ufList.body);
         ufs.forEach((uf) {
-          mUFList.add(uf["sigla"]);
+          tmpUfList.add(uf["sigla"]);
         });
 
+        mUFList.addAll(tmpUfList);
+
       }
+
+      cepLoading = false;
+
     });
   }
 
   @action
   void getCities() {
 
+    mCities.clear();
+
     RequestHttpService.requestCitiesByState(mUF).then((citiesResponse) {
 
       if (citiesResponse != null && citiesResponse.statusCode == 200 &&
           citiesResponse.body != null && citiesResponse.body.isNotEmpty) {
 
+        List<String> tmpCitiesList = [];
+
         var citiesJson = json.decoder.convert(citiesResponse.body);
         citiesJson.forEach((city) {
-          mCities.add(city["nome"]);
+          tmpCitiesList.add(city["nome"]);
         });
 
+        mCities.addAll(tmpCitiesList);
+
       }
+
+      cepLoading = false;
+
     });
   }
 
   @action
   void searchCepByAddress() {
+
+    cepLoading = true;
 
     RequestHttpService.searchCepByAddress(mUF, mCity, mStreet).then((addressResponse) {
 
@@ -539,6 +572,9 @@ abstract class ControllerBase with Store {
         } else
           cepBySearch = "Nada encontrado!";
       }
+
+      cepLoading = false;
+
     });
   }
 

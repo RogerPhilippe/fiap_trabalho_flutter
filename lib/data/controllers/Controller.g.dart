@@ -309,6 +309,36 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$cepLoadingAtom = Atom(name: 'ControllerBase.cepLoading');
+
+  @override
+  bool get cepLoading {
+    _$cepLoadingAtom.reportRead();
+    return super.cepLoading;
+  }
+
+  @override
+  set cepLoading(bool value) {
+    _$cepLoadingAtom.reportWrite(value, super.cepLoading, () {
+      super.cepLoading = value;
+    });
+  }
+
+  final _$exchangeLoadingAtom = Atom(name: 'ControllerBase.exchangeLoading');
+
+  @override
+  bool get exchangeLoading {
+    _$exchangeLoadingAtom.reportRead();
+    return super.exchangeLoading;
+  }
+
+  @override
+  set exchangeLoading(bool value) {
+    _$exchangeLoadingAtom.reportWrite(value, super.exchangeLoading, () {
+      super.exchangeLoading = value;
+    });
+  }
+
   final _$saveTaskAsyncAction = AsyncAction('ControllerBase.saveTask');
 
   @override
@@ -671,7 +701,9 @@ mCities: ${mCities},
 address: ${address},
 mUF: ${mUF},
 mCity: ${mCity},
-cepBySearch: ${cepBySearch}
+cepBySearch: ${cepBySearch},
+cepLoading: ${cepLoading},
+exchangeLoading: ${exchangeLoading}
     ''';
   }
 }
