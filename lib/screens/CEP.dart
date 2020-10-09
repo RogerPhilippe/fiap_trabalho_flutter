@@ -72,7 +72,7 @@ class _CEP extends State<CEP> with WidgetsBindingObserver {
             ),
             Flexible(child:
                 SingleChildScrollView(
-                  padding: EdgeInsets.only(top: 48),
+                  padding: EdgeInsets.only(top: 16),
                   child: Column(
                     children: [
                       Row(

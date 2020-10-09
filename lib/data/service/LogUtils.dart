@@ -1,17 +1,15 @@
-import 'package:flutter/services.dart';
+import 'package:fiap_trabalho_flutter/data/service/MethodChannelService.dart';
 
 class LogUtils {
 
-  static const platform = const MethodChannel('app/logs');
-
   static info(String infoMsg) async {
 
-    await platform.invokeMethod("info", {"infoMsg": infoMsg});
+    await MethodChannelService.logInfo(infoMsg);
   }
 
-  static error(String infoMsg) async {
+  static error(String errorMsg) async {
 
-    await platform.invokeMethod("error", {"errorMsg": infoMsg});
+    await MethodChannelService.logError(errorMsg);
   }
 
 }

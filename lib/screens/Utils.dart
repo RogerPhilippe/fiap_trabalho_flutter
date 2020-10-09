@@ -1,4 +1,5 @@
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
+import 'package:fiap_trabalho_flutter/data/service/MethodChannelService.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/CEP.dart';
@@ -83,23 +84,7 @@ class _Utils extends State<Utils> {
                           MaterialPageRoute(builder: (context) => CEP())
                         )
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
-                    height: 90.0,
-                    width: double.infinity,
-                    child: _buildDefaultBtn("Calculadora", () {
-
-                    }),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
-                    height: 90.0,
-                    width: double.infinity,
-                    child: _buildDefaultBtn("Google Map", () {
-
-                    }),
-                  ),
+                  )
                 ],
               ),
             ))
