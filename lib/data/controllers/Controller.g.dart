@@ -129,18 +129,48 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
-  final _$realAtom = Atom(name: 'ControllerBase.real');
+  final _$dollarToRealAtom = Atom(name: 'ControllerBase.dollarToReal');
 
   @override
-  String get real {
-    _$realAtom.reportRead();
-    return super.real;
+  String get dollarToReal {
+    _$dollarToRealAtom.reportRead();
+    return super.dollarToReal;
   }
 
   @override
-  set real(String value) {
-    _$realAtom.reportWrite(value, super.real, () {
-      super.real = value;
+  set dollarToReal(String value) {
+    _$dollarToRealAtom.reportWrite(value, super.dollarToReal, () {
+      super.dollarToReal = value;
+    });
+  }
+
+  final _$euroToRealAtom = Atom(name: 'ControllerBase.euroToReal');
+
+  @override
+  String get euroToReal {
+    _$euroToRealAtom.reportRead();
+    return super.euroToReal;
+  }
+
+  @override
+  set euroToReal(String value) {
+    _$euroToRealAtom.reportWrite(value, super.euroToReal, () {
+      super.euroToReal = value;
+    });
+  }
+
+  final _$btcToRealAtom = Atom(name: 'ControllerBase.btcToReal');
+
+  @override
+  String get btcToReal {
+    _$btcToRealAtom.reportRead();
+    return super.btcToReal;
+  }
+
+  @override
+  set btcToReal(String value) {
+    _$btcToRealAtom.reportWrite(value, super.btcToReal, () {
+      super.btcToReal = value;
     });
   }
 
@@ -186,6 +216,96 @@ mixin _$Controller on ControllerBase, Store {
   set bitCoin(String value) {
     _$bitCoinAtom.reportWrite(value, super.bitCoin, () {
       super.bitCoin = value;
+    });
+  }
+
+  final _$mUFListAtom = Atom(name: 'ControllerBase.mUFList');
+
+  @override
+  ObservableList<String> get mUFList {
+    _$mUFListAtom.reportRead();
+    return super.mUFList;
+  }
+
+  @override
+  set mUFList(ObservableList<String> value) {
+    _$mUFListAtom.reportWrite(value, super.mUFList, () {
+      super.mUFList = value;
+    });
+  }
+
+  final _$mCitiesAtom = Atom(name: 'ControllerBase.mCities');
+
+  @override
+  ObservableList<String> get mCities {
+    _$mCitiesAtom.reportRead();
+    return super.mCities;
+  }
+
+  @override
+  set mCities(ObservableList<String> value) {
+    _$mCitiesAtom.reportWrite(value, super.mCities, () {
+      super.mCities = value;
+    });
+  }
+
+  final _$addressAtom = Atom(name: 'ControllerBase.address');
+
+  @override
+  String get address {
+    _$addressAtom.reportRead();
+    return super.address;
+  }
+
+  @override
+  set address(String value) {
+    _$addressAtom.reportWrite(value, super.address, () {
+      super.address = value;
+    });
+  }
+
+  final _$mUFAtom = Atom(name: 'ControllerBase.mUF');
+
+  @override
+  String get mUF {
+    _$mUFAtom.reportRead();
+    return super.mUF;
+  }
+
+  @override
+  set mUF(String value) {
+    _$mUFAtom.reportWrite(value, super.mUF, () {
+      super.mUF = value;
+    });
+  }
+
+  final _$mCityAtom = Atom(name: 'ControllerBase.mCity');
+
+  @override
+  String get mCity {
+    _$mCityAtom.reportRead();
+    return super.mCity;
+  }
+
+  @override
+  set mCity(String value) {
+    _$mCityAtom.reportWrite(value, super.mCity, () {
+      super.mCity = value;
+    });
+  }
+
+  final _$cepBySearchAtom = Atom(name: 'ControllerBase.cepBySearch');
+
+  @override
+  String get cepBySearch {
+    _$cepBySearchAtom.reportRead();
+    return super.cepBySearch;
+  }
+
+  @override
+  set cepBySearch(String value) {
+    _$cepBySearchAtom.reportWrite(value, super.cepBySearch, () {
+      super.cepBySearch = value;
     });
   }
 
@@ -244,11 +364,55 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
-  void setReal(String value) {
+  void setDollarToReal(String value) {
     final _$actionInfo = _$ControllerBaseActionController.startAction(
-        name: 'ControllerBase.setReal');
+        name: 'ControllerBase.setDollarToReal');
     try {
-      return super.setReal(value);
+      return super.setDollarToReal(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setEuroToReal(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setEuroToReal');
+    try {
+      return super.setEuroToReal(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setBtcToReal(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setBtcToReal');
+    try {
+      return super.setBtcToReal(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setUF(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setUF');
+    try {
+      return super.setUF(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setCity(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setCity');
+    try {
+      return super.setCity(value);
     } finally {
       _$ControllerBaseActionController.endAction(_$actionInfo);
     }
@@ -282,6 +446,28 @@ mixin _$Controller on ControllerBase, Store {
         name: 'ControllerBase.setBitCoin');
     try {
       return super.setBitCoin(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setCep(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setCep');
+    try {
+      return super.setCep(value);
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setStreet(String value) {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.setStreet');
+    try {
+      return super.setStreet(value);
     } finally {
       _$ControllerBaseActionController.endAction(_$actionInfo);
     }
@@ -420,6 +606,50 @@ mixin _$Controller on ControllerBase, Store {
   }
 
   @override
+  void searchAddressByCep() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.searchAddressByCep');
+    try {
+      return super.searchAddressByCep();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void getUFs() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.getUFs');
+    try {
+      return super.getUFs();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void getCities() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.getCities');
+    try {
+      return super.getCities();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void searchCepByAddress() {
+    final _$actionInfo = _$ControllerBaseActionController.startAction(
+        name: 'ControllerBase.searchCepByAddress');
+    try {
+      return super.searchCepByAddress();
+    } finally {
+      _$ControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 clicks: ${clicks},
@@ -430,10 +660,18 @@ taskSaved: ${taskSaved},
 tasksLoaded: ${tasksLoaded},
 logged: ${logged},
 items: ${items},
-real: ${real},
+dollarToReal: ${dollarToReal},
+euroToReal: ${euroToReal},
+btcToReal: ${btcToReal},
 dollar: ${dollar},
 euro: ${euro},
-bitCoin: ${bitCoin}
+bitCoin: ${bitCoin},
+mUFList: ${mUFList},
+mCities: ${mCities},
+address: ${address},
+mUF: ${mUF},
+mCity: ${mCity},
+cepBySearch: ${cepBySearch}
     ''';
   }
 }

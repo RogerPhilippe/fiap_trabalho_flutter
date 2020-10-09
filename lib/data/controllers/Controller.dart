@@ -45,54 +45,99 @@ abstract class ControllerBase with Store {
   List<Task> updateListTask = [];
   List<Task> removedTaskList = [];
   @observable
-  String real;
+  String dollarToReal;
+  @observable
+  String euroToReal;
+  @observable
+  String btcToReal;
   @observable
   String dollar;
   @observable
   String euro;
   @observable
   String bitCoin;
-  String realUnObservable;
+  String dollarToRealUnObservable;
+  String euroToRealUnObservable;
+  String btcToRealUnObservable;
   String dollarUnObservable;
   String euroUnObservable;
   String bitCoinUnObservable;
+  @observable
+  ObservableList<String> mUFList = ObservableList<String>();
+  @observable
+  ObservableList<String> mCities = ObservableList<String>();
+  String cep;
+  @observable
+  String address = "";
+  @observable
+  String mUF;
+  @observable
+  String mCity;
+  @observable
+  String cepBySearch = "";
+  String mStreet;
 
   @action
-  void increment() {
-    clicks++;
-  }
+  void increment() { clicks++; }
+
   @action
-  void setName(String nameValue) {
-    name = nameValue;
-  }
+  void setName(String nameValue) { name = nameValue; }
+
   @action
-  void setDescription(String descriptionValue) {
-    description = descriptionValue;
-  }
+  void setDescription(String descriptionValue) { description = descriptionValue; }
+
   @action
-  void setDateTodo(int dateTodoValue) {
-    dateTodo = dateTodoValue;
+  void setDateTodo(int dateTodoValue) { dateTodo = dateTodoValue; }
+
+  @action
+  void setDollarToReal(String value) { dollarToRealUnObservable = value; }
+
+  @action
+  void setEuroToReal(String value) { euroToRealUnObservable = value; }
+
+  @action
+  void setBtcToReal(String value) { btcToRealUnObservable = value; }
+
+  @action
+  void setUF(String value) {
+    this.mUF = value;
+    this.getCities();
   }
 
   @action
-  void setReal(String value) {
-    realUnObservable = value;
-  }
+  void setCity(String value) { this.mCity = value; }
 
   @action
   void setDollar(String value) {
     dollarUnObservable = value;
+    if (value.isEmpty) {
+      dollarToReal = "";
+      dollarToRealUnObservable = "";
+    }
   }
 
   @action
   void setEuro(String value) {
     euroUnObservable = value;
+    if (value.isEmpty) {
+      euroToReal = "";
+      euroToRealUnObservable = "";
+    }
   }
   @action
   void setBitCoin(String value) {
     bitCoinUnObservable = value;
+    if (value.isEmpty) {
+      btcToReal = "";
+      btcToRealUnObservable = "";
+    }
   }
 
+  @action
+  void setCep(String value) { this.cep = value; }
+
+  @action
+  void setStreet(String value) { this.mStreet = value; }
 
   @action
   Future<bool> saveTask() async {
@@ -378,25 +423,124 @@ abstract class ControllerBase with Store {
       if (response != null && response.statusCode == 200 &&
           response.body != null && response.body.isNotEmpty) {
 
-        // json.decoder.convert(response.body)["USD"]// USD, EUR, BTC ["high"]
         var usd = json.decoder.convert(response.body)["USD"];
         var eur = json.decoder.convert(response.body)["EUR"];
         var btc = json.decoder.convert(response.body)["BTC"];
+
         if (value == "dollar") {
-          if (realUnObservable != null && realUnObservable.isNotEmpty) {
-            var realDouble = double.tryParse(realUnObservable);
+          if (dollarToRealUnObservable != null && dollarToRealUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(dollarToRealUnObservable);
             var dollarDouble = realDouble / double.tryParse(usd["high"]);
             dollar = dollarDouble.toString();
             dollarUnObservable = dollarDouble.toString();
           }
           else if (dollarUnObservable != null && dollarUnObservable.isNotEmpty) {
             var realDouble = double.tryParse(usd["high"]) * double.tryParse(dollarUnObservable);
-            real = realDouble.toString();
-            realUnObservable = realDouble.toString();
+            dollarToReal = realDouble.toString();
+            dollarToRealUnObservable = realDouble.toString();
+          }
+        }
+
+        if (value == "euro") {
+          if (euroToRealUnObservable != null && euroToRealUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(euroToRealUnObservable);
+            var euroDouble = realDouble / double.tryParse(eur["high"]);
+            euro = euroDouble.toString();
+            euroUnObservable = euroDouble.toString();
+          }
+          else if (euroUnObservable != null && euroUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(eur["high"]) * double.tryParse(euroUnObservable);
+            euroToReal = realDouble.toString();
+            euroToRealUnObservable = realDouble.toString();
+          }
+        }
+
+        if (value == "btc") {
+          if (btcToRealUnObservable != null && btcToRealUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(btcToRealUnObservable);
+            var btcDouble = realDouble / double.tryParse(btc["high"]);
+            bitCoin = btcDouble.toString();
+            bitCoinUnObservable = btcDouble.toString();
+          }
+          else if (bitCoinUnObservable != null && bitCoinUnObservable.isNotEmpty) {
+            var realDouble = double.tryParse(btc["high"]) * double.tryParse(bitCoinUnObservable);
+            btcToReal = realDouble.toString();
+            btcToRealUnObservable = realDouble.toString();
           }
         }
       }
     });
   }
+
+  @action
+  void searchAddressByCep() {
+
+    RequestHttpService.searchAddressByCep(cep).then((addressResponse) {
+
+      if (addressResponse != null && addressResponse.statusCode == 200 &&
+          addressResponse.body != null && addressResponse.body.isNotEmpty) {
+        var jsonAddress = json.decoder.convert(addressResponse.body);
+        address = "${jsonAddress["logradouro"]}, ${jsonAddress["complemento"]} - "
+            "${jsonAddress["bairro"]} - ${jsonAddress["localidade"]} - "
+            "${jsonAddress["uf"]}";
+      } else
+        address = "";
+
+    });
+
+  }
+
+  @action
+  void getUFs() {
+
+    RequestHttpService.requestUFs().then((ufList) {
+
+      if (ufList != null && ufList.statusCode == 200 && ufList.body != null &&
+          ufList.body.isNotEmpty) {
+
+        var ufs = json.decoder.convert(ufList.body);
+        ufs.forEach((uf) {
+          mUFList.add(uf["sigla"]);
+        });
+
+      }
+    });
+  }
+
+  @action
+  void getCities() {
+
+    RequestHttpService.requestCitiesByState(mUF).then((citiesResponse) {
+
+      if (citiesResponse != null && citiesResponse.statusCode == 200 &&
+          citiesResponse.body != null && citiesResponse.body.isNotEmpty) {
+
+        var citiesJson = json.decoder.convert(citiesResponse.body);
+        citiesJson.forEach((city) {
+          mCities.add(city["nome"]);
+        });
+
+      }
+    });
+  }
+
+  @action
+  void searchCepByAddress() {
+
+    RequestHttpService.searchCepByAddress(mUF, mCity, mStreet).then((addressResponse) {
+
+      if (addressResponse != null && addressResponse.statusCode == 200 &&
+      addressResponse.body != null && addressResponse.body.isNotEmpty) {
+
+        var addresses = json.decoder.convert(addressResponse.body);
+        if (addresses != null && addresses.isNotEmpty) {
+          var addressJson = addresses[0];
+          cepBySearch = "CEP: ${addressJson["cep"]} - Bairro: ${addressJson["bairro"]}";
+        } else
+          cepBySearch = "Nada encontrado!";
+      }
+    });
+  }
+
 
 }

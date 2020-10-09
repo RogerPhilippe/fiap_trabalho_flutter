@@ -41,7 +41,11 @@ class _Exchange extends State<Exchange> with WidgetsBindingObserver {
       backgroundColor: appDarkGreyColor,
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
-      body: _bodyBuilder(),
+      body: Stack(
+        children: [
+          _bodyBuilder()
+        ],
+      ),
     );
   }
 
@@ -64,87 +68,100 @@ class _Exchange extends State<Exchange> with WidgetsBindingObserver {
                     ]
                 )
             ),
-            SingleChildScrollView(
-              padding: EdgeInsets.only(top: 48),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(24, 16, 8, 16),
-                            child:  Observer(builder: (_){
-                              realToDollarController.text = mController.real;
-                              return _buildDefaultTextField("Real", realToDollarController, (value) => mController.setReal(value));
-                            })
-                          )
-                      ),
-                      Flexible(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(8, 16, 16, 16),
-                            child: Observer(builder: (_) {
-                              dollarToRealController.text = mController.dollar;
-                              return _buildDefaultTextField("Dolar", dollarToRealController, (value) => mController.setDollar(value));
-                            })
-                          )
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(8, 16, 24, 16),
-                        child: _buildDefaultBtn("Calc.", () => {
-                          mController.exchangeService("dollar")
-                        }),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(24, 16, 8, 16),
-                            child:  _buildDefaultTextField("Real", realToEuroController, (value) => mController.setReal(value)),
-                          )
-                      ),
-                      Flexible(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(8, 16, 16, 16),
-                            child: _buildDefaultTextField("Euro", euroToRealController, (value) => mController.setEuro(value)),
-                          )
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(8, 16, 24, 16),
-                        child: _buildDefaultBtn("Calc.", () => {}),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(24, 16, 8, 16),
-                            child:  _buildDefaultTextField("Real", realToBcController, (value) => mController.setReal(value)),
-                          )
-                      ),
-                      Flexible(
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(8, 16, 16, 16),
-                            child: _buildDefaultTextField("BitCoin", bcToRealController, (value) => mController.setBitCoin(value)),
-                          )
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(8, 16, 24, 16),
-                        child: _buildDefaultBtn("Calc.", () => {}),
-                      )
-                    ],
-                  )
-                ],
-              )
-            )
+            Flexible(child: SingleChildScrollView(
+                padding: EdgeInsets.only(top: 48),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(24, 16, 8, 16),
+                                child:  Observer(builder: (_){
+                                  realToDollarController.text = mController.dollarToReal;
+                                  return _buildDefaultTextField("Real", realToDollarController, (value) => mController.setDollarToReal(value));
+                                })
+                            )
+                        ),
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                child: Observer(builder: (_) {
+                                  dollarToRealController.text = mController.dollar;
+                                  return _buildDefaultTextField("Dolar", dollarToRealController, (value) => mController.setDollar(value));
+                                })
+                            )
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(8, 16, 24, 16),
+                          child: _buildDefaultBtn("Calc.", () => {
+                            mController.exchangeService("dollar")
+                          }),
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(24, 16, 8, 16),
+                                child:  Observer(builder: (_){
+                                  realToEuroController.text = mController.euroToReal;
+                                  return _buildDefaultTextField("Real", realToEuroController, (value) => mController.setEuroToReal(value));
+                                })
+                            )
+                        ),
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                child: Observer(builder: (_) {
+                                  euroToRealController.text = mController.euro;
+                                  return _buildDefaultTextField("Euro", euroToRealController, (value) => mController.setEuro(value));
+                                })
+                            )
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(8, 16, 24, 16),
+                          child: _buildDefaultBtn("Calc.", () => {
+                            mController.exchangeService("euro")
+                          }),
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(24, 16, 8, 16),
+                                child:  Observer(builder: (_){
+                                  realToBcController.text = mController.btcToReal;
+                                  return _buildDefaultTextField("Real", realToBcController, (value) => mController.setBtcToReal(value));
+                                })
+                            )
+                        ),
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                child: Observer(builder: (_) {
+                                  bcToRealController.text = mController.bitCoin;
+                                  return _buildDefaultTextField("BitCoin", bcToRealController, (value) => mController.setBitCoin(value));
+                                })
+                            )
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(8, 16, 24, 16),
+                          child: _buildDefaultBtn("Calc.", () => {
+                            mController.exchangeService("btc")
+                          }),
+                        )
+                      ],
+                    )
+                  ],
+                )
+            ))
           ],
         )
     );
@@ -170,7 +187,7 @@ class _Exchange extends State<Exchange> with WidgetsBindingObserver {
 
   Widget _buildDefaultTextField(String hint, TextEditingController controller, Function func) {
     return TextField(
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.number,
       decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: mainColor),

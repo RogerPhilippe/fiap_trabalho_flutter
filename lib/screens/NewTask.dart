@@ -64,10 +64,10 @@ class _NewTaskState extends State<NewTask> {
                   ]
               )
           ),
-          SingleChildScrollView(
+          Flexible(child: SingleChildScrollView(
             padding: EdgeInsets.only(top: 12.0, bottom: 12.0),
             child: _formContent(),
-          )
+          ))
         ],
       ),
     );

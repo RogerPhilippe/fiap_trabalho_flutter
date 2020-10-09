@@ -1,6 +1,7 @@
 import 'package:fiap_trabalho_flutter/data/controllers/Controller.dart';
 import 'package:fiap_trabalho_flutter/data/utils/UserSession.dart';
 import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
+import 'package:fiap_trabalho_flutter/screens/CEP.dart';
 import 'package:fiap_trabalho_flutter/screens/Exchange.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,7 @@ class _Utils extends State<Utils> {
                     ]
                 )
             ),
+            Flexible(child:
             SingleChildScrollView(
               padding: EdgeInsets.only(top: 48),
               child: Column(
@@ -68,7 +70,7 @@ class _Utils extends State<Utils> {
                     width: double.infinity,
                     child: _buildDefaultBtn("Câmbio", () =>
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Exchange())
+                            MaterialPageRoute(builder: (context) => Exchange())
                         )
                     ),
                   ),
@@ -76,9 +78,11 @@ class _Utils extends State<Utils> {
                     padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
                     height: 90.0,
                     width: double.infinity,
-                    child: _buildDefaultBtn("Busca CEP", () {
-
-                    }),
+                    child: _buildDefaultBtn("Busca CEP", () =>
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => CEP())
+                        )
+                    ),
                   ),
                   Container(
                     padding: EdgeInsets.fromLTRB(40, 16, 40, 16),
@@ -98,7 +102,7 @@ class _Utils extends State<Utils> {
                   ),
                 ],
               ),
-            )
+            ))
           ],
         )
     );

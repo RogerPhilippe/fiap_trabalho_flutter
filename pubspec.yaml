@@ -37,6 +37,7 @@ dependencies:
   get_it:
   datetime_picker_formfield: ^1.0.0
   http:
+  flutter_masked_text: ^0.7.0
 
 dev_dependencies:
   flutter_test:
