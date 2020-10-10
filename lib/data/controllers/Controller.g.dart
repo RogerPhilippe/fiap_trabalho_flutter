@@ -114,6 +114,21 @@ mixin _$Controller on ControllerBase, Store {
     });
   }
 
+  final _$synchronizingAtom = Atom(name: 'ControllerBase.synchronizing');
+
+  @override
+  bool get synchronizing {
+    _$synchronizingAtom.reportRead();
+    return super.synchronizing;
+  }
+
+  @override
+  set synchronizing(bool value) {
+    _$synchronizingAtom.reportWrite(value, super.synchronizing, () {
+      super.synchronizing = value;
+    });
+  }
+
   final _$itemsAtom = Atom(name: 'ControllerBase.items');
 
   @override
@@ -689,6 +704,7 @@ dateTodo: ${dateTodo},
 taskSaved: ${taskSaved},
 tasksLoaded: ${tasksLoaded},
 logged: ${logged},
+synchronizing: ${synchronizing},
 items: ${items},
 dollarToReal: ${dollarToReal},
 euroToReal: ${euroToReal},

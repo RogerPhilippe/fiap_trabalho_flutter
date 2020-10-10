@@ -6,6 +6,7 @@ import 'package:fiap_trabalho_flutter/helpers/Constants.dart';
 import 'package:fiap_trabalho_flutter/screens/utils/DialogUtils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
@@ -43,11 +44,17 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
 
   // Body
   Widget _buildBody() {
-    return Stack(
-      children: <Widget>[
-        _buildContent(),
-      ],
-    );
+    return Observer(builder: (_) {
+      if (mController.synchronizing)
+        return Center(child: CircularProgressIndicator());
+      else {
+        return Stack(
+          children: <Widget>[
+            _buildContent(),
+          ],
+        );
+      }
+    });
   }
 
   Widget _buildContent() {

@@ -41,6 +41,8 @@ abstract class ControllerBase with Store {
   @observable
   bool logged = false;
   @observable
+  bool synchronizing = false;
+  @observable
   ObservableList<Task> items = ObservableList<Task>();
   List<Task> updateListTask = [];
   List<Task> removedTaskList = [];
@@ -341,6 +343,8 @@ abstract class ControllerBase with Store {
   @action
   void saveTaskFirebase(BuildContext context, UserSession userSession) {
 
+    synchronizing = true;
+
     DatabaseHandler.getDatabase().then((db) {
       TaskRepository.tasks(db).then((taskList) async {
 
@@ -352,13 +356,23 @@ abstract class ControllerBase with Store {
           DialogUtils.makeOkDialog(context, "Tarefas salvas na nuvem.");
         }
 
-      }).catchError((onError) => LogUtils.error('Erro ao buscar tarefas!'));
-    }).catchError((onError) => LogUtils.error('Erro ao abrir banco de dados!'));
+        synchronizing = false;
+
+      }).catchError((onError) {
+        synchronizing = false;
+        LogUtils.error('Erro ao buscar tarefas!');
+      });
+    }).catchError((onError) {
+      synchronizing = false;
+      LogUtils.error('Erro ao abrir banco de dados!');
+    });
 
   }
 
   @action
   void getTasks(BuildContext context, UserSession userSession) {
+
+    synchronizing = true;
 
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     DatabaseHandler.getDatabase().then((db) async {
@@ -386,12 +400,16 @@ abstract class ControllerBase with Store {
         }
       });
 
+      synchronizing = false;
+
     });
 
   }
 
   @action
   void removeTasks(BuildContext context, UserSession userSession) {
+
+    synchronizing = true;
 
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseService.removeTasks(userSession, firestore);
@@ -402,11 +420,15 @@ abstract class ControllerBase with Store {
       if (rowsAffected > 0)
         DialogUtils.makeOkDialog(context, "Tarefas excluidas.");
 
+      synchronizing = false;
+
     });
   }
 
   @action
   void removeUser(BuildContext context, UserSession userSession) {
+
+    synchronizing = true;
 
     DatabaseHandler.getDatabase().then((db) async {
       await UserRepository.deleteAll(db);
@@ -417,6 +439,8 @@ abstract class ControllerBase with Store {
       FirebaseService.removeUser(userSession, firestore);
 
       userSession.clearUser();
+
+      synchronizing = false;
 
     });
   }
